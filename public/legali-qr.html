@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Legali — Establecimiento Protegido</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0B1F3A;
+    --navy-mid: #152E52;
+    --navy-light: #1E3F6F;
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --cream: #F7F3EC;
+    --white: #FDFCFA;
+    --text: #0B1F3A;
+    --text-2: #4A5568;
+    --border: rgba(11,31,58,0.12);
+    --shadow: 0 4px 24px rgba(11,31,58,0.10);
+    --shadow-lg: 0 12px 48px rgba(11,31,58,0.16);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Background pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(11,31,58,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(201,168,76,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+    animation: fadeDown 0.5s ease both;
+  }
+
+  .logo-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .logo-mark {
+    width: 44px;
+    height: 44px;
+    background: var(--navy);
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-mark svg { width: 24px; height: 24px; }
+
+  .logo-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--navy);
+    letter-spacing: -0.02em;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--navy);
+    color: var(--gold-light);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ADE80;
+    box-shadow: 0 0 6px #4ADE80;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: var(--navy);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .header p {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+
+  /* Store card */
+  .store-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: var(--shadow);
+    animation: fadeDown 0.5s 0.1s ease both;
+  }
+
+  .store-icon {
+    width: 42px;
+    height: 42px;
+    background: var(--navy);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 20px;
+  }
+
+  .store-info { flex: 1; }
+  .store-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 2px;
+  }
+  .store-meta {
+    font-size: 12px;
+    color: var(--text-2);
+  }
+
+  .verified-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0F6E56;
+    background: #E8F5F1;
+    padding: 4px 8px;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  /* Main options */
+  .options-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-2);
+    margin-bottom: 12px;
+    padding: 0 2px;
+    animation: fadeDown 0.5s 0.15s ease both;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .option-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 20px;
+    border-radius: 16px;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    text-decoration: none;
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-btn:active { transform: scale(0.98); }
+
+  .option-btn.inspector {
+    background: var(--navy);
+    box-shadow: 0 4px 20px rgba(11,31,58,0.25);
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+
+  .option-btn.inspector:hover {
+    box-shadow: 0 8px 32px rgba(11,31,58,0.35);
+    transform: translateY(-2px);
+  }
+
+  .option-btn.pqrs {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow);
+    animation: fadeUp 0.5s 0.25s ease both;
+  }
+
+  .option-btn.pqrs:hover {
+    border-color: var(--navy);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+
+  .option-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 22px;
+  }
+
+  .inspector .option-icon {
+    background: rgba(201,168,76,0.15);
+  }
+
+  .pqrs .option-icon {
+    background: var(--cream);
+  }
+
+  .option-content { flex: 1; }
+
+  .option-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+
+  .inspector .option-title { color: #fff; }
+  .pqrs .option-title { color: var(--navy); }
+
+  .option-desc {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .inspector .option-desc { color: rgba(255,255,255,0.65); }
+  .pqrs .option-desc { color: var(--text-2); }
+
+  .option-arrow {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .inspector .option-arrow { color: var(--gold-light); }
+  .pqrs .option-arrow { color: var(--navy); }
+
+  /* Gold accent line */
+  .inspector::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
+  }
+
+  /* Legal refs */
+  .legal-refs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    animation: fadeUp 0.5s 0.3s ease both;
+  }
+
+  .legal-tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(11,31,58,0.06);
+    color: var(--navy);
+    border: 1px solid rgba(11,31,58,0.1);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.6;
+    animation: fadeUp 0.5s 0.35s ease both;
+  }
+
+  .footer strong { color: var(--navy); }
+
+  /* PQRS Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(11,31,58,0.6);
+    backdrop-filter: blur(6px);
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--white);
+    border-radius: 24px 24px 0 0;
+    padding: 28px 24px 40px;
+    width: 100%;
+    max-width: 480px;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .modal-overlay.open .modal {
+    transform: translateY(0);
+  }
+
+  .modal-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 24px;
+  }
+
+  .modal h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--navy);
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .modal p {
+    font-size: 14px;
+    color: var(--text-2);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  .form-group { margin-bottom: 14px; }
+
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 6px;
+    letter-spacing: 0.03em;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.15s;
+    appearance: none;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--navy);
+    background: var(--white);
+  }
+
+  .form-group textarea {
+    resize: none;
+    height: 90px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background 0.15s, transform 0.1s;
+    position: relative;
+  }
+
+  .submit-btn:hover { background: var(--navy-light); }
+  .submit-btn:active { transform: scale(0.98); }
+
+  .cancel-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: var(--text-2);
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  /* Success state */
+  .success-state {
+    text-align: center;
+    padding: 20px 0;
+    display: none;
+  }
+
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    background: #E8F5F1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 28px;
+  }
+
+  .success-state h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+
+  .success-state p {
+    font-size: 14px;
+    color: var(--text-2);
+    margin-bottom: 0;
+  }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-wrap">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L4 6v6c0 5.25 3.5 10 8 12 4.5-2 8-6.75 8-12V6L12 2z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      </div>
+      <span class="logo-name">Legali</span>
+    </div>
+    <div>
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        Cumplimiento legal activo
+      </div>
+    </div>
+    <h1>Establecimiento<br>Protegido</h1>
+    <p>Este negocio opera bajo supervisión legal continua.<br>Selecciona la opción que corresponde a tu visita.</p>
+  </div>
+
+  <!-- Store card -->
+  <div class="store-card">
+    <div class="store-icon">🏪</div>
+    <div class="store-info">
+      <div class="store-name" id="storeName">Establecimiento Legali</div>
+      <div class="store-meta">Centro Comercial · Bogotá, Colombia</div>
+    </div>
+    <div class="verified-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+      Activo
+    </div>
+  </div>
+
+  <!-- Options label -->
+  <div class="options-label">Selecciona tu tipo de visita</div>
+
+  <!-- Options -->
+  <div class="options">
+
+    <!-- Inspector -->
+    <a href="https://wa.me/573104571338?text=Hola%2C+soy+inspector+de+%5Bentidad%5D+realizando+una+visita+al+establecimiento.+Me+comunico+a+trav%C3%A9s+del+sistema+Legali." class="option-btn inspector" target="_blank">
+      <div class="option-icon">⚖️</div>
+      <div class="option-content">
+        <div class="option-title">Soy inspector o autoridad</div>
+        <div class="option-desc">Policía, SIC, Alcaldía, DIAN u otro ente de control</div>
+      </div>
+      <div class="option-arrow">→</div>
+    </a>
+
+    <!-- PQRS -->
+    <button class="option-btn pqrs" onclick="openPQRS()">
+      <div class="option-icon">📋</div>
+      <div class="option-content">
+        <div class="option-title">Soy cliente</div>
+        <div class="option-desc">Radicar una queja, petición, reclamo o sugerencia</div>
+      </div>
+      <div class="option-arrow">→</div>
+    </button>
+
+  </div>
+
+  <!-- Legal refs -->
+  <div class="legal-refs">
+    <span class="legal-tag">Ley 1480 · Consumidor</span>
+    <span class="legal-tag">Ley 1581 · Habeas Data</span>
+    <span class="legal-tag">CST</span>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    Operado por <strong>Legali — Central de Cumplimiento B2B</strong><br>
+    Sistema de protección legal para establecimientos colombianos
+  </div>
+
+</div>
+
+<!-- PQRS Modal -->
+<div class="modal-overlay" id="pqrsModal" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+
+    <div id="formState">
+      <h2>Radicar PQRS</h2>
+      <p>Tu solicitud será atendida conforme a la <strong>Ley 1480</strong> (Estatuto del Consumidor) en un plazo máximo de 15 días hábiles.</p>
+
+      <div class="form-group">
+        <label>Tipo de solicitud</label>
+        <select id="pqrsType">
+          <option value="">Selecciona...</option>
+          <option value="Petición">Petición</option>
+          <option value="Queja">Queja</option>
+          <option value="Reclamo">Reclamo</option>
+          <option value="Sugerencia">Sugerencia</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Tu nombre</label>
+        <input type="text" id="pqrsName" placeholder="Nombre completo" />
+      </div>
+
+      <div class="form-group">
+        <label>Teléfono o correo</label>
+        <input type="text" id="pqrsContact" placeholder="Para responderte" />
+      </div>
+
+      <div class="form-group">
+        <label>Describe tu solicitud</label>
+        <textarea id="pqrsDesc" placeholder="Cuéntanos qué ocurrió..."></textarea>
+      </div>
+
+      <button class="submit-btn" onclick="submitPQRS()">Enviar por WhatsApp →</button>
+      <button class="cancel-btn" onclick="closePQRS()">Cancelar</button>
+    </div>
+
+    <div class="success-state" id="successState">
+      <div class="success-icon">✓</div>
+      <h3>¡PQRS enviada!</h3>
+      <p>Tu solicitud fue recibida. Te contactaremos en los próximos 15 días hábiles según la Ley 1480.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Set store name from URL param if exists
+  const params = new URLSearchParams(window.location.search);
+  const store = params.get('negocio');
+  if (store) {
+    document.getElementById('storeName').textContent = decodeURIComponent(store);
+  }
+
+  function openPQRS() {
+    document.getElementById('pqrsModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePQRS() {
+    document.getElementById('pqrsModal').classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => {
+      document.getElementById('formState').style.display = 'block';
+      document.getElementById('successState').style.display = 'none';
+    }, 400);
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('pqrsModal')) closePQRS();
+  }
+
+  function submitPQRS() {
+    const type = document.getElementById('pqrsType').value;
+    const name = document.getElementById('pqrsName').value.trim();
+    const contact = document.getElementById('pqrsContact').value.trim();
+    const desc = document.getElementById('pqrsDesc').value.trim();
+    const store = document.getElementById('storeName').textContent;
+
+    if (!type || !name || !desc) {
+      alert('Por favor completa los campos obligatorios.');
+      return;
+    }
+
+    const msg = `🛡️ *PQRS Legali*\n\n*Tipo:* ${type}\n*Nombre:* ${name}\n*Contacto:* ${contact || 'No indicado'}\n*Establecimiento:* ${store}\n\n*Descripción:*\n${desc}\n\n_Enviado desde el sistema Legali_`;
+    const url = `https://wa.me/573104571338?text=${encodeURIComponent(msg)}`;
+
+    window.open(url, '_blank');
+
+    document.getElementById('formState').style.display = 'none';
+    document.getElementById('successState').style.display = 'block';
+  }
+</script>
+</body>
+</html>
