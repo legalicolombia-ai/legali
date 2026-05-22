@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legali — Asistente Legal IA</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FDFCFA;
+    --border: #E2DDD5;
+    --border-strong: #C8C2B8;
+    --text: #1A1814;
+    --text-2: #6B6560;
+    --text-3: #9B9590;
+    --accent: #1C4D3E;
+    --accent-light: #E8F2EE;
+    --accent-mid: #2D7A62;
+    --user-bg: #1C4D3E;
+    --user-text: #EAF5F0;
+    --tag-bg: #EEF7F2;
+    --tag-text: #1C5C45;
+    --warn: #7A3E1C;
+    --warn-bg: #FDF2EB;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-size: 15px;
+  }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 56px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    gap: 16px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-mark svg { width: 18px; height: 18px; }
+  .logo-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .header-center {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    max-width: 420px;
+  }
+
+  .context-selector {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 13px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: border-color 0.15s;
+    flex: 1;
+  }
+  .context-selector:hover { border-color: var(--border-strong); }
+  .context-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-mid); flex-shrink: 0; }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .api-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Layout ── */
+  .layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── Sidebar ── */
+  aside {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-section {
+    padding: 16px 16px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 8px;
+  }
+
+  .topic-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 10px;
+    border: none;
+    background: transparent;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-2);
+    text-align: left;
+    transition: background 0.12s, color 0.12s;
+    margin-bottom: 2px;
+  }
+  .topic-btn:hover { background: var(--bg); color: var(--text); }
+  .topic-btn.active { background: var(--accent-light); color: var(--accent); font-weight: 500; }
+  .topic-icon { font-size: 14px; flex-shrink: 0; }
+
+  .kb-status {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .kb-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+  }
+  .kb-name { color: var(--text-2); }
+  .kb-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--accent-mid);
+  }
+  .kb-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-mid); }
+
+  /* ── Chat area ── */
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-width: 780px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 24px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    scroll-behavior: smooth;
+  }
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ── Messages ── */
+  .msg { display: flex; gap: 10px; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .msg.user { flex-direction: row-reverse; }
+
+  .avatar {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .avatar.legali { background: var(--accent); color: #fff; }
+  .avatar.user { background: var(--border); color: var(--text-2); font-size: 11px; font-weight: 500; }
+
+  .bubble {
+    max-width: 72%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    line-height: 1.65;
+    font-size: 14px;
+  }
+  .msg.legali .bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 4px 12px 12px 12px;
+    box-shadow: var(--shadow);
+  }
+  .msg.user .bubble {
+    background: var(--user-bg);
+    color: var(--user-text);
+    border-radius: 12px 4px 12px 12px;
+  }
+
+  .bubble strong { font-weight: 500; color: var(--accent); }
+  .msg.user .bubble strong { color: #A8D8C8; }
+
+  .bubble .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 15px;
+    color: var(--text);
+    margin: 12px 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .bubble .section-title:first-child { margin-top: 0; }
+
+  .bubble ul { padding-left: 16px; margin: 6px 0; }
+  .bubble ul li { margin-bottom: 4px; color: var(--text-2); }
+
+  .legal-tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    font-weight: 500;
+    margin: 2px 2px 2px 0;
+  }
+
+  .disclaimer {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: var(--warn-bg);
+    border-left: 3px solid var(--warn);
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    color: var(--warn);
+    line-height: 1.5;
+  }
+
+  .sources {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-3);
+  }
+  .sources span { font-weight: 500; color: var(--text-2); }
+
+  .typing {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 16px;
+  }
+  .typing-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border-strong);
+    animation: bounce 1.2s infinite ease-in-out;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+  }
+
+  /* ── Suggestions ── */
+  .suggestions {
+    padding: 0 24px 16px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .sug-chip {
+    padding: 6px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  .sug-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+  /* ── Input ── */
+  .input-area {
+    padding: 0 24px 20px;
+    flex-shrink: 0;
+  }
+  .input-box {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    box-shadow: var(--shadow-md);
+    transition: border-color 0.15s;
+  }
+  .input-box:focus-within { border-color: var(--accent); }
+
+  textarea {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    resize: none;
+    outline: none;
+    line-height: 1.5;
+    max-height: 120px;
+    min-height: 24px;
+  }
+  textarea::placeholder { color: var(--text-3); }
+
+  .send-btn {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .send-btn:hover { background: var(--accent-mid); }
+  .send-btn:active { transform: scale(0.95); }
+  .send-btn:disabled { background: var(--border); cursor: not-allowed; }
+  .send-btn svg { width: 16px; height: 16px; }
+
+  .input-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+    padding: 0 2px;
+    font-size: 11px;
+    color: var(--text-3);
+  }
+
+  /* ── Welcome ── */
+  .welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 40px 24px 24px;
+    gap: 12px;
+  }
+  .welcome-icon {
+    width: 52px; height: 52px;
+    background: var(--accent);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 4px;
+  }
+  .welcome h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .welcome p {
+    font-size: 14px;
+    color: var(--text-2);
+    max-width: 380px;
+    line-height: 1.6;
+  }
+  .welcome-chips {
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 4px;
+  }
+  .welcome-chip {
+    padding: 8px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.12s;
+    text-align: left;
+  }
+  .welcome-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .welcome-chip strong { display: block; color: var(--text); font-weight: 500; font-size: 13px; margin-bottom: 2px; }
+
+  /* ── API key modal ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(10,10,8,0.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+  }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    width: 400px;
+    box-shadow: var(--shadow-md);
+    animation: slideUp 0.2s ease;
+  }
+  @keyframes slideUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+  .modal h3 { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 6px; letter-spacing: -0.01em; }
+  .modal p { font-size: 13px; color: var(--text-2); line-height: 1.6; margin-bottom: 16px; }
+  .modal input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color 0.15s;
+  }
+  .modal input:focus { border-color: var(--accent); }
+  .modal button {
+    width: 100%;
+    padding: 10px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .modal button:hover { background: var(--accent-mid); }
+  .modal .skip-link {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--text-3);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .modal .skip-link:hover { color: var(--text-2); }
+</style>
+</head>
+<body>
+
+<!-- API Key Modal -->
+<div class="modal-overlay" id="apiModal">
+  <div class="modal">
+    <h3>Configura tu API Key</h3>
+    <p>Para usar el asistente legal IA, ingresa tu Anthropic API key. Se guarda solo en tu navegador y nunca se envía a ningún servidor externo.</p>
+    <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." />
+    <button onclick="saveApiKey()">Activar Legali IA</button>
+    <span class="skip-link" onclick="useDemoMode()">Usar modo demo (respuestas simuladas)</span>
+  </div>
+</div>
+
+<!-- Header -->
+<header>
+  <a class="logo" href="#">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L4 6v6c0 5.25 3.5 10 8 12 4.5-2 8-6.75 8-12V6L12 2z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <span class="logo-name">Legali</span>
+  </a>
+
+  <div class="header-center">
+    <div class="context-selector">
+      <div class="context-dot"></div>
+      <span>Normativa colombiana activa</span>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <span class="api-badge" id="modelBadge">Claude Sonnet 4</span>
+  </div>
+</header>
+
+<!-- Layout -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Áreas legales</div>
+      <button class="topic-btn active" onclick="setTopic(this, 'general')">
+        <span class="topic-icon">⚖️</span> General
+      </button>
+      <button class="topic-btn" onclick="setTopic(this, 'laboral')">
+        <span class="topic-icon">👷</span> Derecho laboral
+      </button>
+      <button class="topic-btn" onclick="setTopic(this, 'comercial')">
+        <span class="topic-icon">🏪</span> Derecho comercial
+      </button>
+      <button class="topic-btn" onclick="setTopic(this, 'contratos')">
+        <span class="topic-icon">📄</span> Contratos
+      </button>
+      <button class="topic-btn" onclick="setTopic(this, 'tributario')">
+        <span class="topic-icon">💰</span> Tributario DIAN
+      </button>
+      <button class="topic-btn" onclick="setTopic(this, 'sic')">
+        <span class="topic-icon">🛡️</span> Protección datos (SIC)
+      </button>
+      <button class="topic-btn" onclick="setTopic(this, 'propiedad')">
+        <span class="topic-icon">📝</span> Propiedad intelectual
+      </button>
+    </div>
+    <div class="sidebar-section" style="border-bottom:none; flex:1;">
+      <div class="sidebar-label">Base de conocimiento</div>
+      <div class="kb-status">
+        <div class="kb-item">
+          <span class="kb-name">Código de Comercio</span>
+          <span class="kb-indicator"><div class="kb-dot"></div> Activo</span>
+        </div>
+        <div class="kb-item">
+          <span class="kb-name">Código Sustantivo del Trabajo</span>
+          <span class="kb-indicator"><div class="kb-dot"></div> Activo</span>
+        </div>
+        <div class="kb-item">
+          <span class="kb-name">Estatuto Tributario</span>
+          <span class="kb-indicator"><div class="kb-dot"></div> Activo</span>
+        </div>
+        <div class="kb-item">
+          <span class="kb-name">Ley 1581 (Habeas Data)</span>
+          <span class="kb-indicator"><div class="kb-dot"></div> Activo</span>
+        </div>
+        <div class="kb-item">
+          <span class="kb-name">Ley 1480 (Consumidor)</span>
+          <span class="kb-indicator"><div class="kb-dot"></div> Activo</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main chat -->
+  <main>
+    <div class="messages" id="messages">
+      <!-- Welcome state shown initially -->
+      <div class="welcome" id="welcomeScreen">
+        <div class="welcome-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L4 6v6c0 5.25 3.5 10 8 12 4.5-2 8-6.75 8-12V6L12 2z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <h2>Asesor legal para tu negocio</h2>
+        <p>Consulta sobre contratos, obligaciones laborales, cumplimiento tributario y más — siempre desde el marco legal colombiano.</p>
+        <div class="welcome-chips">
+          <div class="welcome-chip" onclick="sendSuggestion('¿Qué obligaciones laborales tengo si contrato mi primer empleado en Colombia?')">
+            <strong>Primer empleado</strong>
+            Obligaciones laborales
+          </div>
+          <div class="welcome-chip" onclick="sendSuggestion('¿Qué cláusulas debe tener un contrato de prestación de servicios en Colombia?')">
+            <strong>Contrato de servicios</strong>
+            Cláusulas esenciales
+          </div>
+          <div class="welcome-chip" onclick="sendSuggestion('¿Cómo debo manejar los datos personales de mis clientes según la Ley 1581?')">
+            <strong>Habeas Data</strong>
+            Protección de datos
+          </div>
+          <div class="welcome-chip" onclick="sendSuggestion('¿Cuáles son mis obligaciones con la DIAN si tengo una tienda virtual?')">
+            <strong>E-commerce DIAN</strong>
+            Obligaciones tributarias
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="suggestions" id="suggestions" style="display:none;">
+      <div class="sug-chip" onclick="sendSuggestion('¿Esto aplica a mi sector específico?')">¿Aplica a mi sector?</div>
+      <div class="sug-chip" onclick="sendSuggestion('¿Cuáles son las sanciones si no cumplo?')">¿Qué pasa si no cumplo?</div>
+      <div class="sug-chip" onclick="sendSuggestion('Genera un checklist de cumplimiento para lo que me explicaste')">Generar checklist</div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-box">
+        <textarea
+          id="msgInput"
+          placeholder="Pregunta sobre normativa colombiana, contratos, obligaciones..."
+          rows="1"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+      <div class="input-footer">
+        <span>Legali usa IA para orientación legal — no reemplaza asesoría jurídica profesional</span>
+        <span id="charCount">0 / 1000</span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ── State ──
+let apiKey = '';
+let demoMode = false;
+let currentTopic = 'general';
+let conversationHistory = [];
+let isLoading = false;
+
+// ── Colombian legal system prompt ──
+const SYSTEM_PROMPT = `Eres Legali, el asistente legal inteligente especializado en derecho colombiano para empresas, emprendedores y pymes.
+
+Tu conocimiento cubre:
+- Código de Comercio colombiano (Decreto 410 de 1971 y modificaciones)
+- Código Sustantivo del Trabajo (CST) y legislación laboral colombiana
+- Estatuto Tributario colombiano y normativa DIAN
+- Ley 1581 de 2012 (Habeas Data / protección de datos personales)
+- Ley 1480 de 2011 (Estatuto del Consumidor)
+- Ley 1819 de 2016 y reformas tributarias posteriores
+- Decreto Legislativo 410 de 1971 (Código de Comercio)
+- Normativa Cámara de Comercio de Bogotá y Colombia
+- Ley 590 de 2000 y 905 de 2004 (Mipymes)
+- Ley 1429 de 2010 (formalización empresarial)
+- Decreto 1074 de 2015 (Decreto Único Reglamentario del sector Comercio)
+- SIC (Superintendencia de Industria y Comercio) - normativa de competencia y protección al consumidor
+- Ley 23 de 1982 y Decisión Andina 351 (propiedad intelectual)
+- Código Civil colombiano (contratos civiles)
+
+Área actual del usuario: ${currentTopic === 'general' ? 'General' : currentTopic}
+
+INSTRUCCIONES DE RESPUESTA:
+1. Siempre cita la norma específica que aplica (ej: "Art. 23 CST", "Ley 1581 Art. 4")
+2. Usa lenguaje claro y accesible para empresarios no abogados
+3. Estructura tus respuestas con secciones claras cuando la respuesta es compleja
+4. Al final de cada respuesta importante, agrega un aviso breve recordando que esto es orientación general y que casos específicos requieren consulta con abogado
+5. Cuando aplique, menciona entidades reguladoras relevantes (DIAN, SIC, Min. de Trabajo, Cámara de Comercio)
+6. Si el usuario pregunta algo fuera del contexto legal colombiano empresarial, redirige amablemente a tu especialidad
+7. Responde siempre en español colombiano
+
+FORMATO: Usa texto limpio. Para listas usa "•". Para normas cítalas en negrita como **Art. X Ley Y**.`;
+
+// ── Topic system prompts ──
+const TOPIC_CONTEXTS = {
+  general: 'Cubre todas las áreas del derecho empresarial colombiano.',
+  laboral: 'Enfócate en el Código Sustantivo del Trabajo, contratos laborales, nómina, prestaciones sociales, seguridad social, y normativa del Ministerio de Trabajo.',
+  comercial: 'Enfócate en el Código de Comercio, constitución de sociedades, obligaciones mercantiles, registro mercantil y Cámara de Comercio.',
+  contratos: 'Enfócate en contratos civiles y comerciales colombianos: elementos esenciales, tipos, cláusulas, incumplimiento y remedios legales.',
+  tributario: 'Enfócate en el Estatuto Tributario colombiano, obligaciones con la DIAN, IVA, retención en la fuente, impuesto de renta y facturación electrónica.',
+  sic: 'Enfócate en Ley 1581 (habeas data), Ley 1480 (consumidor), Superintendencia de Industria y Comercio, y protección de datos personales.',
+  propiedad: 'Enfócate en Ley 23 de 1982, Decisión Andina 351, marcas, patentes, derechos de autor y propiedad industrial en Colombia.'
+};
+
+// ── Init ──
+window.onload = () => {
+  const stored = sessionStorage.getItem('legali_key');
+  if (stored) { apiKey = stored; document.getElementById('apiModal').style.display = 'none'; }
+};
+
+function saveApiKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if (!val.startsWith('sk-')) { alert('API key inválida. Debe empezar con sk-ant-...'); return; }
+  apiKey = val;
+  sessionStorage.setItem('legali_key', val);
+  document.getElementById('apiModal').style.display = 'none';
+}
+
+function useDemoMode() {
+  demoMode = true;
+  document.getElementById('apiModal').style.display = 'none';
+  document.getElementById('modelBadge').textContent = 'Modo demo';
+}
+
+// ── Topic selector ──
+function setTopic(btn, topic) {
+  document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentTopic = topic;
+}
+
+// ── Send message ──
+async function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text || isLoading) return;
+
+  // Hide welcome
+  const welcome = document.getElementById('welcomeScreen');
+  if (welcome) welcome.remove();
+  document.getElementById('suggestions').style.display = 'flex';
+
+  appendMessage('user', text);
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('charCount').textContent = '0 / 1000';
+
+  conversationHistory.push({ role: 'user', content: text });
+
+  if (demoMode) {
+    await showDemoResponse(text);
+  } else {
+    await callClaudeAPI(text);
+  }
+}
+
+function appendMessage(role, content, isHTML = false) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+
+  const avatarText = role === 'legali'
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5.25 3.5 10 8 12 4.5-2 8-6.75 8-12V6L12 2z"/><path d="M9 12l2 2 4-4"/></svg>`
+    : 'TÚ';
+
+  div.innerHTML = `
+    <div class="avatar ${role}">${avatarText}</div>
+    <div class="bubble">${isHTML ? content : escapeAndFormat(content)}</div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function escapeAndFormat(text) {
+  return text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '</p><p style="margin-top:8px;">')
+    .replace(/\n•/g, '<br>•')
+    .replace(/\n/g, '<br>');
+}
+
+function showTyping() {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg legali';
+  div.id = 'typingIndicator';
+  div.innerHTML = `
+    <div class="avatar legali">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L4 6v6c0 5.25 3.5 10 8 12 4.5-2 8-6.75 8-12V6L12 2z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <div class="bubble"><div class="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+// ── Claude API call ──
+async function callClaudeAPI(userMessage) {
+  isLoading = true;
+  document.getElementById('sendBtn').disabled = true;
+  const typing = showTyping();
+
+  const systemWithTopic = SYSTEM_PROMPT.replace(
+    'Área actual del usuario: ' + (currentTopic === 'general' ? 'General' : currentTopic),
+    'Área actual: ' + (TOPIC_CONTEXTS[currentTopic] || TOPIC_CONTEXTS.general)
+  );
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-calls': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        system: systemWithTopic,
+        messages: conversationHistory
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.error) throw new Error(data.error.message);
+
+    const reply = data.content[0].text;
+    conversationHistory.push({ role: 'assistant', content: reply });
+
+    typing.remove();
+    appendMessage('legali', reply);
+
+  } catch (err) {
+    typing.remove();
+    appendMessage('legali', `**Error de conexión:** ${err.message}\n\nVerifica que tu API key sea válida y que tengas créditos disponibles en Anthropic.`);
+  } finally {
+    isLoading = false;
+    document.getElementById('sendBtn').disabled = false;
+  }
+}
+
+// ── Demo mode responses ──
+async function showDemoResponse(query) {
+  isLoading = true;
+  document.getElementById('sendBtn').disabled = true;
+  const typing = showTyping();
+  await new Promise(r => setTimeout(r, 1200));
+  typing.remove();
+
+  const q = query.toLowerCase();
+  let response = '';
+
+  if (q.includes('empleado') || q.includes('laboral') || q.includes('contrato de trabajo')) {
+    response = `<div class="section-title">Obligaciones al contratar tu primer empleado</div>
+Al vincular un empleado en Colombia, debes cumplir con estas obligaciones establecidas en el <strong>Código Sustantivo del Trabajo (CST)</strong>:
+
+<strong>1. Afiliación al sistema de seguridad social</strong>
+• Salud: <strong>Art. 204 Ley 100/1993</strong> — aporte del 12.5% (8.5% empleador, 4% empleado)
+• Pensión: <strong>Art. 20 Ley 100/1993</strong> — 16% (12% empleador, 4% empleado)
+• ARL: según el nivel de riesgo de la actividad (entre 0.348% y 8.7%)
+
+<strong>2. Parafiscales (si tienes más de 10 empleados)</strong>
+• SENA: 2%, ICBF: 3%, Caja de Compensación: 4%
+
+<strong>3. Prestaciones sociales</strong>
+• Prima de servicios: 15 días de salario por semestre (<strong>Art. 306 CST</strong>)
+• Cesantías: 1 mes de salario por año (<strong>Art. 249 CST</strong>)
+• Intereses sobre cesantías: 12% anual (<strong>Art. 1 Ley 52/1975</strong>)
+• Vacaciones: 15 días hábiles por año (<strong>Art. 186 CST</strong>)
+
+<div class="disclaimer">⚠️ Esta es orientación general. Para situaciones específicas — tipos de contrato, salario integral, trabajadores independientes — consulta con un abogado laboral.</div>
+<div class="sources">Fuentes: <span>CST Arts. 186, 249, 306</span> · <span>Ley 100/1993</span> · <span>Min. de Trabajo Colombia</span></div>`;
+  } else if (q.includes('contrato') && (q.includes('servicio') || q.includes('prestación'))) {
+    response = `<div class="section-title">Cláusulas esenciales del contrato de prestación de servicios</div>
+El contrato de prestación de servicios es un contrato civil/comercial regulado por el <strong>Código Civil (Arts. 2063-2069)</strong> y el <strong>Código de Comercio</strong>.
+
+<strong>Cláusulas que no pueden faltar:</strong>
+• <strong>Objeto:</strong> descripción específica del servicio a prestar
+• <strong>Valor y forma de pago:</strong> honorarios, periodicidad, método
+• <strong>Plazo:</strong> fecha de inicio y terminación o condición resolutoria
+• <strong>Obligaciones de las partes:</strong> qué entrega cada uno
+• <strong>Propiedad intelectual:</strong> a quién pertenecen los entregables (<strong>Ley 23/1982</strong>)
+• <strong>Confidencialidad:</strong> protección de información del cliente
+• <strong>Independencia del contratista:</strong> cláusula que evite la presunción de contrato laboral (<strong>Art. 24 CST</strong>)
+• <strong>Causales de terminación</strong> y consecuencias
+
+<strong>Diferencia clave con contrato laboral:</strong>
+Si hay subordinación, horario fijo y dependencia económica exclusiva, la ley presume contrato laboral (<strong>Art. 23 CST</strong>). Esto puede generar pasivos laborales.
+
+<div class="disclaimer">⚠️ Un mal redactado contrato de servicios puede ser recaracterizado como laboral. Te recomendamos revisarlo con un abogado antes de firmarlo.</div>
+<div class="sources">Fuentes: <span>CST Art. 23-24</span> · <span>Código Civil Arts. 2063-2069</span> · <span>Ley 23/1982</span></div>`;
+  } else if (q.includes('datos') || q.includes('habeas') || q.includes('1581') || q.includes('privacidad')) {
+    response = `<div class="section-title">Protección de datos personales — Ley 1581 de 2012</div>
+La <strong>Ley 1581 de 2012</strong> (Habeas Data) y el <strong>Decreto 1074/2015</strong> regulan el tratamiento de datos personales en Colombia. La SIC supervisa su cumplimiento.
+
+<strong>Obligaciones principales para tu negocio:</strong>
+• <strong>Aviso de privacidad:</strong> informar qué datos recoges, para qué y con quién los compartes (<strong>Art. 12 Ley 1581</strong>)
+• <strong>Autorización:</strong> obtener consentimiento previo, expreso e informado (<strong>Art. 9</strong>)
+• <strong>Política de tratamiento:</strong> documento público disponible en tu web (<strong>Art. 13</strong>)
+• <strong>Registro de bases de datos:</strong> registrar tus bases ante la SIC si corresponde (<strong>Art. 25</strong>)
+• <strong>Derechos del titular:</strong> acceso, corrección, supresión y revocación
+
+<strong>Sanciones por incumplimiento (Art. 23):</strong>
+• Multas hasta 2.000 SMMLV (~$2.300 millones COP)
+• Cierre temporal o definitivo de la operación
+• La SIC ha sancionado empresas colombianas de todos los tamaños
+
+<strong>
+<span class="legal-tag">Ley 1581/2012</span>
+<span class="legal-tag">Decreto 1074/2015</span>
+<span class="legal-tag">SIC</span>
+</strong>
+
+<div class="disclaimer">⚠️ Si tu negocio maneja datos sensibles (salud, datos financieros, menores), las obligaciones son más estrictas. Consulta con un especialista en datos personales.</div>`;
+  } else if (q.includes('dian') || q.includes('tributari') || q.includes('iva') || q.includes('impuesto') || q.includes('tienda virtual') || q.includes('e-commerce')) {
+    response = `<div class="section-title">Obligaciones tributarias para comercio electrónico en Colombia</div>
+Si tienes una tienda virtual o negocio digital en Colombia, la <strong>DIAN</strong> te exige cumplir con el <strong>Estatuto Tributario (ET)</strong> y sus decretos reglamentarios.
+
+<strong>Obligaciones principales:</strong>
+• <strong>RUT actualizado:</strong> con actividad económica de comercio electrónico (<strong>Art. 555-2 ET</strong>)
+• <strong>Facturación electrónica:</strong> obligatoria para todos los contribuyentes desde 2022 (<strong>Decreto 358/2020</strong>)
+• <strong>IVA:</strong> si vendes bienes o servicios gravados, debes declarar bimestralmente (<strong>Art. 468 ET</strong> — tarifa general 19%)
+• <strong>Retención en la fuente:</strong> si pagas a proveedores o empleados
+• <strong>Impuesto de renta:</strong> declaración anual si superas la base mínima
+
+<strong>Servicios digitales desde el exterior (economía digital):</strong>
+Desde 2018 (<strong>Ley 1943</strong>), plataformas como Netflix, Spotify, Google Workspace están obligadas a cobrar IVA en Colombia. Si eres intermediario, puedes tener obligaciones adicionales.
+
+<strong>Regímenes especiales:</strong>
+• Pequeños comerciantes: considera el <strong>Régimen Simple de Tributación</strong> — puede simplificar significativamente tus obligaciones
+
+<span class="legal-tag">Estatuto Tributario</span>
+<span class="legal-tag">DIAN</span>
+<span class="legal-tag">Facturación electrónica</span>
+
+<div class="disclaimer">⚠️ La normativa tributaria en Colombia cambia frecuentemente con cada reforma. Consulta con un contador público o tributarista para tu situación específica.</div>`;
+  } else {
+    response = `<div class="section-title">Consulta recibida</div>
+Gracias por tu pregunta. En modo demo, Legali tiene respuestas predefinidas para los temas más comunes.
+
+Para usar el asistente completo con respuestas reales de Claude sobre cualquier tema legal colombiano, ingresa tu <strong>Anthropic API key</strong> en la pantalla inicial.
+
+Puedes probar con preguntas sobre:
+• Obligaciones al contratar empleados
+• Contratos de prestación de servicios
+• Protección de datos personales (Ley 1581)
+• Obligaciones tributarias DIAN / e-commerce
+
+<div class="disclaimer">Recuerda: Legali proporciona orientación legal general basada en la normativa colombiana. Para tu situación específica, consulta siempre con un abogado.</div>`;
+  }
+
+  conversationHistory.push({ role: 'assistant', content: '[Demo response]' });
+  appendMessage('legali', response, true);
+  isLoading = false;
+  document.getElementById('sendBtn').disabled = false;
+}
+
+// ── Helpers ──
+function sendSuggestion(text) {
+  document.getElementById('msgInput').value = text;
+  sendMessage();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  document.getElementById('charCount').textContent = `${el.value.length} / 1000`;
+  if (el.value.length > 1000) el.value = el.value.slice(0, 1000);
+}
+</script>
+</body>
+</html>
