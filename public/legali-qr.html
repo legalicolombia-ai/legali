@@ -617,6 +617,18 @@
         <textarea id="pqrsDesc" placeholder="Cuéntanos qué ocurrió..."></textarea>
       </div>
 
+      <div class="form-group">
+        <label>Adjuntar documento o imagen <span style="font-weight:400;color:var(--text-2)">(opcional)</span></label>
+        <div id="fileDropZone" onclick="document.getElementById('pqrsFile').click()" style="border:1.5px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:var(--cream);transition:border-color 0.15s;">
+          <div style="font-size:24px;margin-bottom:6px;">&#128206;</div>
+          <div id="fileLabel" style="font-size:13px;color:var(--text-2);line-height:1.5;">
+            Toca para adjuntar una foto o documento<br>
+            <span style="font-size:11px;color:var(--text-3);">JPG, PNG, PDF &middot; Máx. 10MB</span>
+          </div>
+        </div>
+        <input type="file" id="pqrsFile" accept="image/*,.pdf,.doc,.docx" style="display:none" onchange="handleFileSelect(this)">
+      </div>
+
       <button class="submit-btn" onclick="submitPQRS()">Enviar por WhatsApp →</button>
       <button class="cancel-btn" onclick="closePQRS()">Cancelar</button>
     </div>
@@ -653,6 +665,16 @@
 
   function handleOverlayClick(e) {
     if (e.target === document.getElementById('pqrsModal')) closePQRS();
+  }
+
+  function handleFileSelect(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const zone = document.getElementById('fileDropZone');
+    const label = document.getElementById('fileLabel');
+    zone.style.borderColor = '#0F6E56';
+    zone.style.background = '#E8F5F1';
+    label.innerHTML = `<span style="color:#0F6E56;font-weight:500;">✓ ${file.name}</span><br><span style="font-size:11px;color:var(--text-3);">${(file.size/1024).toFixed(0)} KB · Toca para cambiar</span>`;
   }
 
   function submitPQRS() {
