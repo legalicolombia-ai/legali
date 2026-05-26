@@ -499,6 +499,107 @@
     from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
   }
+
+  /* ── Panic Button ── */
+  .panic-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 20px;
+    background: #C53030;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 20px rgba(197,48,48,0.35);
+    transition: transform 0.1s, box-shadow 0.1s;
+    margin-bottom: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .panic-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .panic-btn:active { transform: scale(0.97); box-shadow: 0 2px 8px rgba(197,48,48,0.3); }
+  .panic-btn:active::before { opacity: 1; }
+  .panic-btn .panic-icon { font-size: 24px; animation: shake 2s infinite; }
+  @keyframes shake {
+    0%, 90%, 100% { transform: rotate(0deg); }
+    92% { transform: rotate(-8deg); }
+    94% { transform: rotate(8deg); }
+    96% { transform: rotate(-8deg); }
+    98% { transform: rotate(8deg); }
+  }
+  .panic-note {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-3);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  /* Panic modal */
+  .panic-overlay {
+    position: fixed; inset: 0;
+    background: rgba(197,48,48,0.85);
+    backdrop-filter: blur(6px);
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .panic-overlay.open { opacity: 1; pointer-events: all; }
+  .panic-modal {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px 24px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    transform: scale(0.9);
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .panic-overlay.open .panic-modal { transform: scale(1); }
+  .panic-modal .panic-big-icon { font-size: 56px; margin-bottom: 12px; display: block; }
+  .panic-modal h2 { font-family: "DM Serif Display", serif; font-size: 24px; color: #C53030; margin-bottom: 8px; }
+  .panic-modal p { font-size: 14px; color: var(--text-2); line-height: 1.6; margin-bottom: 24px; }
+  .panic-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 15px;
+    border-radius: 12px;
+    border: none;
+    font-family: "DM Sans", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    margin-bottom: 10px;
+    transition: transform 0.1s;
+  }
+  .panic-action-btn:active { transform: scale(0.97); }
+  .panic-action-btn.police { background: #2B6CB0; color: #fff; }
+  .panic-action-btn.police-backup { background: #2C7A7B; color: #fff; }
+  .panic-action-btn.legali { background: var(--navy); color: #fff; }
+  .panic-cancel { display: block; margin-top: 12px; font-size: 13px; color: var(--text-3); cursor: pointer; text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -564,6 +665,13 @@
       </div>
       <div class="option-arrow">→</div>
     </button>
+
+    <!-- Botón de pánico -->
+    <button class="panic-btn" onclick="openPanic()">
+      <span class="panic-icon">🚨</span>
+      BOTÓN DE PÁNICO
+    </button>
+    <p class="panic-note">Solo para emergencias · Hurto o situación de riesgo<br>Alerta inmediata a Policía y Legali</p>
 
   </div>
 
@@ -696,6 +804,56 @@
 
     document.getElementById('formState').style.display = 'none';
     document.getElementById('successState').style.display = 'block';
+  }
+</script>
+
+<!-- Panic Modal -->
+<div class="panic-overlay" id="panicOverlay">
+  <div class="panic-modal">
+    <span class="panic-big-icon">🚨</span>
+    <h2>¿Confirmar emergencia?</h2>
+    <p>Se enviará una alerta inmediata al cuadrante de Policía y al equipo Legali con la ubicación de este establecimiento.</p>
+
+    <a id="btnCuadrante" href="#" class="panic-action-btn police" onclick="sendPanicAlerts()">
+      📞 Alertar Cuadrante Policía
+    </a>
+    <a href="sms:156&body=EMERGENCIA%20-%20Establecimiento%20requiere%20apoyo%20policial%20inmediato" class="panic-action-btn police-backup">
+      📟 Línea 156 (Policía Nacional)
+    </a>
+    <a id="btnLegali" href="#" class="panic-action-btn legali">
+      🛡️ Notificar a Legali
+    </a>
+    <span class="panic-cancel" onclick="closePanic()">Cancelar — fue un error</span>
+  </div>
+</div>
+
+<script>
+  // Panic functions
+  function openPanic() {
+    const params = new URLSearchParams(window.location.search);
+    const store = decodeURIComponent(params.get('negocio') || 'Establecimiento Legali');
+    const cuadrante = params.get('cuadrante') || '156';
+    const time = new Date().toLocaleString('es-CO', {timeZone:'America/Bogota'});
+
+    // Set cuadrante button
+    const smsMsg = encodeURIComponent('🚨 EMERGENCIA LEGALI\n\nEstablecimiento: ' + store + '\nFecha/Hora: ' + time + '\nSolicita apoyo policial INMEDIATO\nSistema: Legali - Central de Cumplimiento B2B');
+    document.getElementById('btnCuadrante').href = 'sms:' + cuadrante + '&body=' + smsMsg;
+
+    // Set Legali WhatsApp button
+    const waMsg = encodeURIComponent('🚨 *ALERTA DE PÁNICO LEGALI*\n\n*Establecimiento:* ' + store + '\n*Hora:* ' + time + '\n\n⚠️ El establecimiento activó el botón de pánico. Verificar emergencia de inmediato.');
+    document.getElementById('btnLegali').href = 'https://wa.me/573104571338?text=' + waMsg;
+
+    document.getElementById('panicOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function sendPanicAlerts() {
+    setTimeout(() => { closePanic(); }, 500);
+  }
+
+  function closePanic() {
+    document.getElementById('panicOverlay').classList.remove('open');
+    document.body.style.overflow = '';
   }
 </script>
 </body>
