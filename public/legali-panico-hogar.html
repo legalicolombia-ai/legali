@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Legali — Botón de Pánico para tu Hogar</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:opsz,wght@9..40,300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0B1F3A;
+  --red: #C53030;
+  --red-mid: #9B2C2C;
+  --red-light: #FFF5F5;
+  --red-border: rgba(197,48,48,0.2);
+  --gold: #C9A84C;
+  --gold-pale: #FBF5E6;
+  --cream: #F9F6F0;
+  --white: #FEFDFB;
+  --text: #0B1F3A;
+  --text-2: #4A5C72;
+  --text-3: #8A9BAE;
+  --border: rgba(11,31,58,0.10);
+  --shadow: 0 2px 12px rgba(11,31,58,0.08);
+  --shadow-lg: 0 16px 48px rgba(11,31,58,0.14);
+  --shadow-red: 0 8px 32px rgba(197,48,48,0.3);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body { font-family: "DM Sans", sans-serif; background: var(--cream); color: var(--text); overflow-x: hidden; min-height: 100vh; }
+
+/* NAV */
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 clamp(16px,5vw,48px); height: 56px;
+  background: var(--white); border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+.nav-shield { width: 30px; height: 30px; background: var(--navy); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.nav-shield svg { width: 16px; height: 16px; }
+.nav-brand { font-family: "Playfair Display", serif; font-size: 20px; color: var(--navy); letter-spacing: -0.02em; }
+.nav-badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; background: var(--red-light); color: var(--red); border: 1px solid var(--red-border); }
+
+/* HERO */
+.hero {
+  text-align: center;
+  padding: clamp(48px,10vw,100px) clamp(20px,6vw,60px) clamp(40px,8vw,80px);
+  background: linear-gradient(180deg, #1a0505 0%, #2d0a0a 60%, var(--cream) 100%);
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 50% 30%, rgba(197,48,48,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(197,48,48,0.15); border: 1px solid rgba(197,48,48,0.3);
+  border-radius: 20px; padding: 5px 14px;
+  font-size: 11px; font-weight: 600; color: #FC8181;
+  letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 20px;
+}
+.blink { width: 6px; height: 6px; border-radius: 50%; background: #FC8181; animation: blink 1.2s infinite; }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+
+.hero h1 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(32px,6vw,64px); font-weight: 900;
+  color: #fff; letter-spacing: -0.03em; line-height: 1.08;
+  max-width: 700px; margin: 0 auto 16px;
+}
+.hero h1 em { font-style: italic; color: #FC8181; }
+.hero-sub {
+  font-size: clamp(15px,2vw,18px); color: rgba(255,255,255,0.6);
+  max-width: 480px; margin: 0 auto 36px; line-height: 1.65;
+}
+
+/* Panic button preview */
+.panic-preview {
+  display: inline-block; margin-bottom: 40px;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+.panic-preview img { width: min(340px, 90vw); border-radius: 16px; box-shadow: var(--shadow-red); }
+
+/* Stats row */
+.hero-stats {
+  display: flex; gap: 32px; justify-content: center; flex-wrap: wrap;
+  padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.08);
+}
+.hero-stat { text-align: center; }
+.hero-stat-num { font-family: "Playfair Display", serif; font-size: 28px; font-weight: 900; color: #fff; display: block; }
+.hero-stat-label { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+/* CÓMO FUNCIONA */
+.section { padding: clamp(48px,8vw,96px) clamp(20px,6vw,60px); }
+.section-inner { max-width: 900px; margin: 0 auto; }
+.section-tag { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); margin-bottom: 12px; display: block; }
+.section-title { font-family: "Playfair Display", serif; font-size: clamp(24px,4vw,42px); font-weight: 700; color: var(--navy); letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 40px; }
+
+.steps { display: flex; flex-direction: column; gap: 16px; }
+.step {
+  display: flex; align-items: flex-start; gap: 18px;
+  padding: 22px 20px; background: var(--white);
+  border: 1px solid var(--border); border-radius: 14px;
+  transition: box-shadow 0.2s;
+}
+.step:hover { box-shadow: var(--shadow-lg); }
+.step-num {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  background: var(--red-light); border: 2px solid var(--red);
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Playfair Display", serif; font-size: 16px; font-weight: 700; color: var(--red);
+}
+.step-title { font-size: 16px; font-weight: 600; color: var(--navy); margin-bottom: 4px; padding-top: 8px; }
+.step-desc { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+
+/* PRECIO */
+.precio-section { background: var(--navy); padding: clamp(48px,8vw,96px) clamp(20px,6vw,60px); text-align: center; }
+.precio-section .section-tag { color: #FC8181; }
+.precio-section .section-title { color: #fff; margin-bottom: 32px; }
+.precio-cards { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; max-width: 680px; margin: 0 auto 40px; }
+.precio-card {
+  flex: 1; min-width: 240px; max-width: 300px;
+  padding: 32px 24px; border-radius: 18px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  text-align: center; position: relative; overflow: hidden;
+}
+.precio-card.promo { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+.precio-card.promo::before {
+  content: "🎁 LANZAMIENTO";
+  position: absolute; top: 0; left: 0; right: 0;
+  background: var(--gold); color: var(--navy);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  padding: 5px; text-align: center;
+}
+.precio-card.promo .precio-num { margin-top: 20px; }
+.precio-num { font-family: "Playfair Display", serif; font-size: 44px; font-weight: 900; color: #fff; display: block; margin-bottom: 4px; }
+.precio-period { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 16px; display: block; }
+.precio-desc { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.6; }
+.precio-card.promo .precio-desc { color: rgba(255,255,255,0.7); }
+
+.precio-includes { display: flex; flex-direction: column; gap: 10px; max-width: 400px; margin: 0 auto 40px; text-align: left; }
+.precio-item { display: flex; align-items: center; gap: 10px; font-size: 14px; color: rgba(255,255,255,0.7); }
+.precio-check { color: #68D391; font-weight: 700; flex-shrink: 0; }
+
+/* CTA */
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg, #C9A84C, #E8C97A);
+  color: var(--navy); padding: 18px 40px; border-radius: 14px;
+  font-size: 18px; font-weight: 600; text-decoration: none;
+  box-shadow: 0 8px 32px rgba(201,168,76,0.25); transition: all 0.2s;
+}
+.cta-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 48px rgba(201,168,76,0.35); }
+.cta-note { margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.3); }
+
+/* GARANTÍA */
+.garantia-section { padding: clamp(48px,8vw,96px) clamp(20px,6vw,60px); background: var(--white); }
+.garantia-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 16px; margin-top: 40px; }
+.garantia-item {
+  padding: 24px 20px; background: var(--cream); border-radius: 14px;
+  border: 1px solid var(--border); text-align: center;
+}
+.garantia-icon { font-size: 32px; margin-bottom: 12px; display: block; }
+.garantia-title { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
+.garantia-desc { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+
+/* PANIC MODAL */
+.panic-overlay {
+  position: fixed; inset: 0;
+  background: rgba(197,48,48,0.88); backdrop-filter: blur(6px);
+  z-index: 300; display: flex; align-items: center; justify-content: center; padding: 24px;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.panic-overlay.open { opacity: 1; pointer-events: all; }
+.panic-modal {
+  background: #fff; border-radius: 20px; padding: 32px 24px;
+  width: 100%; max-width: 360px; text-align: center;
+  transform: scale(0.9); transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.panic-overlay.open .panic-modal { transform: scale(1); }
+.panic-big { font-size: 52px; margin-bottom: 10px; display: block; animation: shake 1s infinite; }
+@keyframes shake { 0%,90%,100%{transform:rotate(0);} 92%{transform:rotate(-8deg);} 94%{transform:rotate(8deg);} 96%{transform:rotate(-8deg);} 98%{transform:rotate(8deg);} }
+.panic-modal h2 { font-family: "Playfair Display", serif; font-size: 22px; color: var(--red); margin-bottom: 8px; }
+.panic-modal p { font-size: 14px; color: var(--text-2); line-height: 1.6; margin-bottom: 22px; }
+.panic-action {
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  width: 100%; padding: 14px; border-radius: 12px; border: none;
+  font-family: "DM Sans", sans-serif; font-size: 15px; font-weight: 600;
+  cursor: pointer; text-decoration: none; margin-bottom: 10px; transition: transform 0.1s;
+}
+.panic-action:active { transform: scale(0.97); }
+.panic-action.police { background: #2B6CB0; color: #fff; }
+.panic-action.police-backup { background: #2C7A7B; color: #fff; }
+.panic-action.legali { background: var(--navy); color: #fff; }
+.panic-cancel { display: block; margin-top: 12px; font-size: 13px; color: var(--text-3); cursor: pointer; text-decoration: underline; }
+
+/* FOOTER */
+footer {
+  background: #07162A; padding: 28px clamp(20px,6vw,60px);
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+}
+.footer-logo { display: flex; align-items: center; gap: 8px; }
+.footer-name { font-family: "Playfair Display", serif; font-size: 16px; color: rgba(255,255,255,0.5); }
+.footer-text { font-size: 12px; color: rgba(255,255,255,0.2); }
+
+/* WA FLOAT */
+.wa-float {
+  position: fixed; bottom: 20px; right: 20px; z-index: 200;
+  width: 54px; height: 54px; background: #25D366; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(37,211,102,0.4); text-decoration: none; transition: transform 0.2s;
+}
+.wa-float:hover { transform: scale(1.1); }
+
+/* REVEAL */
+.reveal { opacity:0; transform:translateY(18px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .hero-stats { gap: 20px; }
+  .precio-cards { flex-direction: column; align-items: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-shield">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L4 6v6c0 5.25 3.5 10 8 12 4.5-2 8-6.75 8-12V6L12 2z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <span class="nav-brand">Legali</span>
+  </a>
+  <span class="nav-badge">🚨 Botón de Pánico</span>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-eyebrow"><div class="blink"></div>Protección para hogares</div>
+  <h1>En una emergencia,<br>cada segundo <em>cuenta.</em></h1>
+  <p class="hero-sub">Un solo toque alerta a la Policía y al equipo Legali — sin llamadas, sin apps, desde cualquier celular.</p>
+  <div class="panic-preview">
+    <img src="data:image/png;base64,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" alt="Botón de pánico Legali">
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="hero-stat-num">3s</span>
+      <span class="hero-stat-label">tiempo de alerta</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">24/7</span>
+      <span class="hero-stat-label">disponible siempre</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">0</span>
+      <span class="hero-stat-label">apps que instalar</span>
+    </div>
+  </div>
+</section>
+
+<!-- Cómo funciona -->
+<section class="section" style="background:var(--white);">
+  <div class="section-inner">
+    <span class="section-tag reveal">Cómo funciona</span>
+    <h2 class="section-title reveal">Tan simple como<br>abrir un link.</h2>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Nos contactas y activamos tu servicio</div>
+          <p class="step-desc">Nos escribes por WhatsApp. En menos de 24 horas tienes tu link personalizado del botón de pánico listo para usar.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Guardas el link en tu celular</div>
+          <p class="step-desc">Lo guardas en favoritos o en la pantalla de inicio de tu celular — como un ícono de app. Todos en el hogar pueden tenerlo.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">En emergencia, un solo toque</div>
+          <p class="step-desc">Abres el link, presionas el botón de pánico y en segundos se alerta al cuadrante de Policía y al equipo Legali para verificar la emergencia.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Garantías -->
+<section class="garantia-section">
+  <div class="section-inner">
+    <span class="section-tag reveal">Por qué Legali</span>
+    <h2 class="section-title reveal">Sin instalaciones.<br>Sin contratos. Sin complicaciones.</h2>
+    <div class="garantia-grid">
+      <div class="garantia-item reveal">
+        <span class="garantia-icon">📱</span>
+        <div class="garantia-title">Desde cualquier celular</div>
+        <p class="garantia-desc">No importa si es Android o iPhone. Funciona en cualquier dispositivo con internet.</p>
+      </div>
+      <div class="garantia-item reveal">
+        <span class="garantia-icon">👨‍👩‍👧‍👦</span>
+        <div class="garantia-title">Toda la familia protegida</div>
+        <p class="garantia-desc">Comparte el link con todos en el hogar. Cualquier integrante puede activar la alerta.</p>
+      </div>
+      <div class="garantia-item reveal">
+        <span class="garantia-icon">🚔</span>
+        <div class="garantia-title">Alerta directa a Policía</div>
+        <p class="garantia-desc">SMS inmediato al cuadrante más cercano con el nombre y ubicación del hogar.</p>
+      </div>
+      <div class="garantia-item reveal">
+        <span class="garantia-icon">🛡️</span>
+        <div class="garantia-title">Verificación Legali</div>
+        <p class="garantia-desc">Nuestro equipo recibe la alerta y verifica la emergencia contigo en tiempo real.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Precio -->
+<section class="precio-section">
+  <div class="section-inner" style="text-align:center;">
+    <span class="section-tag reveal">Precio</span>
+    <h2 class="section-title reveal">Protege tu hogar hoy.</h2>
+    <div class="precio-cards">
+      <div class="precio-card promo reveal">
+        <span class="precio-num">$25.000</span>
+        <span class="precio-period">por mes · primeros 20 hogares</span>
+        <p class="precio-desc">Precio especial de lanzamiento para La Calera y veredas. Cupos limitados.</p>
+      </div>
+      <div class="precio-card reveal">
+        <span class="precio-num">$35.000</span>
+        <span class="precio-period">por mes · precio regular</span>
+        <p class="precio-desc">Servicio completo de botón de pánico para tu hogar.</p>
+      </div>
+    </div>
+    <div class="precio-includes reveal">
+      <div class="precio-item"><span class="precio-check">✓</span> Link personalizado del botón de pánico</div>
+      <div class="precio-item"><span class="precio-check">✓</span> Alerta al cuadrante de Policía</div>
+      <div class="precio-item"><span class="precio-check">✓</span> Notificación al equipo Legali 24/7</div>
+      <div class="precio-item"><span class="precio-check">✓</span> Sin contratos largos · cancelas cuando quieras</div>
+      <div class="precio-item"><span class="precio-check">✓</span> Link para todos los integrantes del hogar</div>
+    </div>
+    <a class="cta-btn reveal" href="https://wa.me/573104571338?text=Hola%2C+quiero+el+bot%C3%B3n+de+p%C3%A1nico+Legali+para+mi+casa+en+La+Calera" target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      Quiero proteger mi hogar
+    </a>
+    <p class="cta-note">Respuesta en menos de 24 horas · Sin compromiso</p>
+  </div>
+</section>
+
+<!-- Demo botón de pánico -->
+<section class="section" style="background:var(--cream);text-align:center;">
+  <div class="section-inner">
+    <span class="section-tag reveal">Prueba el botón</span>
+    <h2 class="section-title reveal" style="margin-bottom:12px;">Así se ve cuando<br>lo necesitas.</h2>
+    <p style="font-size:14px;color:var(--text-2);margin-bottom:32px;" class="reveal">Así es exactamente como funciona — sin registro, sin contraseña, sin demoras.</p>
+
+    <div style="display:inline-block;background:#1a0505;border-radius:24px;padding:32px 24px;max-width:320px;width:100%;" class="reveal">
+      <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:8px;">Legali · Hogar protegido</div>
+      <div style="font-family:'Playfair Display',serif;font-size:20px;color:#fff;margin-bottom:4px;">Mi Casa — La Calera</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:28px;">Servicio activo · 24/7</div>
+
+      <button onclick="openPanic()" style="
+        width:100%; padding:20px; background:#C53030; border:none; border-radius:14px;
+        font-family:'DM Sans',sans-serif; font-size:18px; font-weight:700; color:#fff;
+        cursor:pointer; display:flex; align-items:center; justify-content:center; gap:12px;
+        box-shadow:0 6px 24px rgba(197,48,48,0.45); transition:transform 0.1s; margin-bottom:12px;
+      " onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform='scale(1)'">
+        <span style="font-size:24px;animation:shake 2s infinite">🚨</span>
+        BOTÓN DE PÁNICO
+      </button>
+      <p style="font-size:11px;color:rgba(255,255,255,0.3);line-height:1.5;">Solo para emergencias reales<br>Hurto · Riesgo personal · Intrusión</p>
+    </div>
+  </div>
+</section>
+
+<!-- Panic Modal -->
+<div class="panic-overlay" id="panicOverlay">
+  <div class="panic-modal">
+    <span class="panic-big">🚨</span>
+    <h2>¿Confirmar emergencia?</h2>
+    <p>Se enviará alerta inmediata al cuadrante de Policía y al equipo Legali con tu ubicación y nombre del hogar.</p>
+    <a href="sms:156&body=EMERGENCIA%20LEGALI%20-%20Mi%20Casa%20La%20Calera%20requiere%20apoyo%20policial%20inmediato" class="panic-action police">
+      📞 Alertar Cuadrante Policía
+    </a>
+    <a href="sms:156&body=EMERGENCIA%20-%20Solicito%20apoyo%20inmediato" class="panic-action police-backup">
+      📟 Línea 156 · Policía Nacional
+    </a>
+    <a href="https://wa.me/573104571338?text=🚨%20*ALERTA%20DE%20PÁNICO%20LEGALI*%0A%0A*Hogar:*%20Mi%20Casa%20-%20La%20Calera%0A*Hora:*%20Emergencia%20activa%0A%0A⚠️%20Se%20activó%20el%20botón%20de%20pánico.%20Verificar%20inmediatamente." class="panic-action legali">
+      🛡️ Notificar a Legali
+    </a>
+    <span class="panic-cancel" onclick="closePanic()">Cancelar — fue un error</span>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">
+    <div class="nav-shield" style="width:26px;height:26px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;">
+        <path d="M12 2L4 6v6c0 5.25 3.5 10 8 12 4.5-2 8-6.75 8-12V6L12 2z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <span class="footer-name">Legali</span>
+  </div>
+  <span class="footer-text">Botón de Pánico para Hogares · La Calera, Colombia · 2026</span>
+</footer>
+
+<!-- WA Float -->
+<a class="wa-float" href="https://wa.me/573104571338?text=Hola%2C+quiero+el+bot%C3%B3n+de+p%C3%A1nico+para+mi+hogar+en+La+Calera" target="_blank">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+</a>
+
+<script>
+function openPanic() {
+  document.getElementById('panicOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePanic() {
+  document.getElementById('panicOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 60);
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
