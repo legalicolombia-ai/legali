@@ -402,14 +402,17 @@ footer {
   <div class="panic-modal">
     <span class="panic-big">🚨</span>
     <h2>¿Confirmar emergencia?</h2>
-    <p>Se enviará alerta inmediata al cuadrante de Policía y al equipo Legali con tu ubicación y nombre del hogar.</p>
-    <a href="sms:156&body=EMERGENCIA%20LEGALI%20-%20Mi%20Casa%20La%20Calera%20requiere%20apoyo%20policial%20inmediato" class="panic-action police">
+    <div id="locationInfo" style="font-size:12px;color:var(--text-2);background:#F0F4F8;border-radius:8px;padding:8px 12px;margin-bottom:16px;line-height:1.5;">
+      📍 Detectando ubicación GPS...
+    </div>
+    <p style="margin-bottom:16px;">Se enviará alerta con tu ubicación exacta al cuadrante de Policía y al equipo Legali.</p>
+    <a id="btnPolicia" href="#" class="panic-action police">
       📞 Alertar Cuadrante Policía
     </a>
-    <a href="sms:156&body=EMERGENCIA%20-%20Solicito%20apoyo%20inmediato" class="panic-action police-backup">
+    <a id="btn156" href="#" class="panic-action police-backup">
       📟 Línea 156 · Policía Nacional
     </a>
-    <a href="https://wa.me/573104571338?text=🚨%20*ALERTA%20DE%20PÁNICO%20LEGALI*%0A%0A*Hogar:*%20Mi%20Casa%20-%20La%20Calera%0A*Hora:*%20Emergencia%20activa%0A%0A⚠️%20Se%20activó%20el%20botón%20de%20pánico.%20Verificar%20inmediatamente." class="panic-action legali">
+    <a id="btnLegali" href="#" class="panic-action legali">
       🛡️ Notificar a Legali
     </a>
     <span class="panic-cancel" onclick="closePanic()">Cancelar — fue un error</span>
@@ -437,9 +440,71 @@ footer {
 
 <script>
 function openPanic() {
-  document.getElementById('panicOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  // Pedir ubicación GPS antes de abrir el modal
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        const lat = position.coords.latitude.toFixed(6);
+        const lng = position.coords.longitude.toFixed(6);
+        const mapsLink = 'https://maps.google.com/?q=' + lat + ',' + lng;
+        const time = new Date().toLocaleString('es-CO', {timeZone:'America/Bogota'});
+        const store = new URLSearchParams(window.location.search).get('hogar') || 'Hogar Legali';
+
+        // SMS al cuadrante con ubicación
+        const smsMsg = encodeURIComponent(
+          '🚨 EMERGENCIA LEGALI\n' +
+          'Hogar: ' + store + '\n' +
+          '📍 Ubicación: ' + mapsLink + '\n' +
+          '🕐 Hora: ' + time + '\n' +
+          'Solicita apoyo policial INMEDIATO'
+        );
+
+        // WhatsApp a Legali con ubicación
+        const waMsg = encodeURIComponent(
+          '🚨 *ALERTA DE PÁNICO LEGALI*\n\n' +
+          '*Hogar:* ' + store + '\n' +
+          '*📍 Ubicación GPS:* ' + mapsLink + '\n' +
+          '*🕐 Hora:* ' + time + '\n\n' +
+          '⚠️ Verificar emergencia INMEDIATAMENTE'
+        );
+
+        // Actualizar links del modal
+        const cuadrante = new URLSearchParams(window.location.search).get('cuadrante') || '156';
+        document.getElementById('btnPolicia').href = 'sms:' + cuadrante + '&body=' + smsMsg;
+        document.getElementById('btn156').href = 'sms:156&body=' + smsMsg;
+        document.getElementById('btnLegali').href = 'https://wa.me/573104571338?text=' + waMsg;
+
+        // Mostrar ubicación en modal
+        document.getElementById('locationInfo').innerHTML =
+          '📍 <strong>Ubicación detectada</strong><br>' +
+          '<a href="' + mapsLink + '" target="_blank" style="color:#2B6CB0;font-size:12px;">' +
+          'Ver en Google Maps → ' + lat + ', ' + lng + '</a>';
+
+        document.getElementById('panicOverlay').classList.add('open');
+        document.body.style.overflow = 'hidden';
+      },
+      function(error) {
+        // Si no da permiso de ubicación, igual abre el modal sin coordenadas
+        const time = new Date().toLocaleString('es-CO', {timeZone:'America/Bogota'});
+        const store = new URLSearchParams(window.location.search).get('hogar') || 'Hogar Legali';
+        const smsMsg = encodeURIComponent('🚨 EMERGENCIA LEGALI - ' + store + ' - ' + time + ' - Solicita apoyo inmediato');
+        const waMsg = encodeURIComponent('🚨 *ALERTA DE PÁNICO LEGALI*\n\n*Hogar:* ' + store + '\n*Hora:* ' + time + '\n\n⚠️ Sin ubicación GPS. Verificar inmediatamente.');
+        const cuadrante = new URLSearchParams(window.location.search).get('cuadrante') || '156';
+        document.getElementById('btnPolicia').href = 'sms:' + cuadrante + '&body=' + smsMsg;
+        document.getElementById('btn156').href = 'sms:156&body=' + smsMsg;
+        document.getElementById('btnLegali').href = 'https://wa.me/573104571338?text=' + waMsg;
+        document.getElementById('locationInfo').innerHTML = '⚠️ Ubicación no disponible — activa el GPS y permite el acceso';
+        document.getElementById('panicOverlay').classList.add('open');
+        document.body.style.overflow = 'hidden';
+      },
+      { timeout: 5000, enableHighAccuracy: true }
+    );
+  } else {
+    document.getElementById('panicOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
 }
+
 function closePanic() {
   document.getElementById('panicOverlay').classList.remove('open');
   document.body.style.overflow = '';
