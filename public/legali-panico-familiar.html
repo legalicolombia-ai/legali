@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Legali — Botón de Pánico Familiar</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:opsz,wght@9..40,300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0B1F3A;
+  --red: #C53030;
+  --red-light: #FFF5F5;
+  --red-border: rgba(197,48,48,0.2);
+  --gold: #C9A84C;
+  --gold-light: #E8C97A;
+  --gold-pale: #FBF5E6;
+  --cream: #F9F6F0;
+  --white: #FEFDFB;
+  --text: #0B1F3A;
+  --text-2: #4A5C72;
+  --text-3: #8A9BAE;
+  --border: rgba(11,31,58,0.10);
+  --green: #25D366;
+  --shadow: 0 2px 12px rgba(11,31,58,0.08);
+  --shadow-lg: 0 16px 48px rgba(11,31,58,0.14);
+  --shadow-red: 0 8px 32px rgba(197,48,48,0.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:"DM Sans",sans-serif;background:var(--cream);color:var(--text);overflow-x:hidden;min-height:100vh;}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,5vw,48px);height:56px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;}
+.nav-shield{width:30px;height:30px;background:var(--navy);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.nav-shield svg{width:16px;height:16px;}
+.nav-brand{font-family:"Playfair Display",serif;font-size:20px;color:var(--navy);letter-spacing:-0.02em;}
+.nav-badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;background:var(--red-light);color:var(--red);border:1px solid var(--red-border);}
+
+/* SCREENS */
+.screen{display:none;min-height:calc(100vh - 56px);}
+.screen.active{display:flex;flex-direction:column;}
+
+/* ── SCREEN 1: REGISTRO ── */
+#screenRegister{background:var(--cream);padding:clamp(32px,6vw,64px) clamp(20px,6vw,48px);align-items:center;}
+.register-inner{width:100%;max-width:480px;}
+.register-inner h1{font-family:"Playfair Display",serif;font-size:clamp(26px,5vw,40px);font-weight:900;color:var(--navy);letter-spacing:-0.03em;line-height:1.1;margin-bottom:10px;}
+.register-inner h1 em{font-style:italic;color:var(--red);}
+.register-inner p{font-size:14px;color:var(--text-2);margin-bottom:28px;line-height:1.6;}
+
+.form-section{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px;}
+.form-section-title{font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:16px;}
+.form-group{margin-bottom:14px;}
+.form-group:last-child{margin-bottom:0;}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--navy);margin-bottom:6px;}
+.form-group input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:"DM Sans",sans-serif;font-size:15px;color:var(--text);background:var(--cream);outline:none;transition:border-color 0.15s;}
+.form-group input:focus{border-color:var(--red);background:var(--white);}
+.form-group input::placeholder{color:var(--text-3);}
+
+.family-member{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.family-num{width:26px;height:26px;border-radius:50%;background:var(--red-light);border:1.5px solid var(--red);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--red);flex-shrink:0;}
+.family-member input{flex:1;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;font-family:"DM Sans",sans-serif;font-size:14px;color:var(--text);background:var(--cream);outline:none;transition:border-color 0.15s;}
+.family-member input:focus{border-color:var(--red);background:var(--white);}
+
+.activate-btn{width:100%;padding:16px;background:var(--navy);color:#fff;border:none;border-radius:14px;font-family:"DM Sans",sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:all 0.2s;margin-top:8px;}
+.activate-btn:hover{background:#152E52;}
+.activate-btn:active{transform:scale(0.98);}
+
+/* ── SCREEN 2: PANEL FAMILIAR ── */
+#screenPanel{background:#0d0505;flex-direction:column;align-items:center;justify-content:space-between;padding:24px 20px 32px;}
+
+.panel-header{text-align:center;margin-bottom:20px;}
+.panel-home{font-size:13px;font-weight:600;color:rgba(255,255,255,0.5);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;}
+.panel-name{font-family:"Playfair Display",serif;font-size:24px;font-weight:900;color:#fff;letter-spacing:-0.02em;}
+.panel-status{display:inline-flex;align-items:center;gap:6px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.2);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:#68D391;margin-top:8px;}
+.status-blink{width:6px;height:6px;border-radius:50%;background:#68D391;animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+
+.family-connected{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px;margin-bottom:20px;width:100%;max-width:380px;}
+.family-connected-title{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px;}
+.family-list{display:flex;flex-direction:column;gap:8px;}
+.family-item{display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.7);}
+.family-icon{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+
+.panic-center{display:flex;flex-direction:column;align-items:center;gap:16px;flex:1;justify-content:center;}
+
+.panic-main-btn{
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, #E53E3E, #9B2C2C);
+  border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 0 0 12px rgba(197,48,48,0.15), 0 0 0 24px rgba(197,48,48,0.07), 0 20px 60px rgba(197,48,48,0.4);
+  transition:transform 0.1s, box-shadow 0.1s;
+  animation:breathe 3s ease-in-out infinite;
+}
+@keyframes breathe{
+  0%,100%{box-shadow:0 0 0 12px rgba(197,48,48,0.15),0 0 0 24px rgba(197,48,48,0.07),0 20px 60px rgba(197,48,48,0.4);}
+  50%{box-shadow:0 0 0 16px rgba(197,48,48,0.2),0 0 0 32px rgba(197,48,48,0.1),0 24px 72px rgba(197,48,48,0.5);}
+}
+.panic-main-btn:active{transform:scale(0.95);box-shadow:0 0 0 6px rgba(197,48,48,0.2),0 8px 32px rgba(197,48,48,0.3);}
+.panic-btn-icon{font-size:48px;}
+.panic-btn-text{font-family:"DM Sans",sans-serif;font-size:13px;font-weight:700;color:#fff;letter-spacing:0.08em;text-transform:uppercase;}
+
+.panic-hint{font-size:12px;color:rgba(255,255,255,0.3);text-align:center;line-height:1.5;}
+
+.panel-actions{display:flex;gap:10px;width:100%;max-width:380px;}
+.panel-action-btn{flex:1;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);font-family:"DM Sans",sans-serif;font-size:12px;font-weight:500;color:rgba(255,255,255,0.6);cursor:pointer;text-align:center;text-decoration:none;transition:all 0.2s;}
+.panel-action-btn:hover{background:rgba(255,255,255,0.09);}
+
+/* ── PANIC MODAL ── */
+.panic-overlay{position:fixed;inset:0;background:rgba(197,48,48,0.9);backdrop-filter:blur(8px);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.panic-overlay.open{opacity:1;pointer-events:all;}
+.panic-modal{background:#fff;border-radius:20px;padding:28px 22px;width:100%;max-width:360px;text-align:center;transform:scale(0.9);transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);}
+.panic-overlay.open .panic-modal{transform:scale(1);}
+.panic-big{font-size:48px;display:block;margin-bottom:8px;animation:shake 1s infinite;}
+@keyframes shake{0%,90%,100%{transform:rotate(0);}92%{transform:rotate(-8deg);}94%{transform:rotate(8deg);}96%{transform:rotate(-8deg);}98%{transform:rotate(8deg);}}
+.panic-modal h2{font-family:"Playfair Display",serif;font-size:20px;color:var(--red);margin-bottom:8px;}
+.loc-info{font-size:11px;color:var(--text-2);background:#F0F4F8;border-radius:8px;padding:8px 12px;margin-bottom:12px;line-height:1.5;text-align:left;}
+.panic-modal p{font-size:13px;color:var(--text-2);line-height:1.5;margin-bottom:16px;}
+.panic-action{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:11px;border:none;font-family:"DM Sans",sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;margin-bottom:8px;transition:transform 0.1s;}
+.panic-action:active{transform:scale(0.97);}
+.panic-action.police{background:#2B6CB0;color:#fff;}
+.panic-action.p156{background:#2C7A7B;color:#fff;}
+.panic-action.wa-legali{background:#075E54;color:#fff;}
+.panic-action.wa-family{background:var(--green);color:#fff;}
+.panic-cancel{display:block;margin-top:10px;font-size:12px;color:var(--text-3);cursor:pointer;text-decoration:underline;}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-shield">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L4 6v6c0 5.25 3.5 10 8 12 4.5-2 8-6.75 8-12V6L12 2z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <span class="nav-brand">Legali</span>
+  </a>
+  <span class="nav-badge">🚨 Pánico Familiar</span>
+</nav>
+
+<!-- SCREEN 1: REGISTRO -->
+<div class="screen active" id="screenRegister">
+  <div class="register-inner">
+    <h1>Protege a tu<br><em>familia completa.</em></h1>
+    <p>Registra tu hogar y los números de tus familiares. Cuando alguien active el botón de pánico, todos recibirán la alerta con ubicación GPS en tiempo real.</p>
+
+    <div class="form-section reveal">
+      <div class="form-section-title">Tu hogar</div>
+      <div class="form-group">
+        <label>Nombre del hogar</label>
+        <input type="text" id="hogarNombre" placeholder="Ej: Casa Familia García" />
+      </div>
+      <div class="form-group">
+        <label>Tu nombre</label>
+        <input type="text" id="userName" placeholder="Tu nombre completo" />
+      </div>
+      <div class="form-group">
+        <label>Tu número WhatsApp</label>
+        <input type="tel" id="userPhone" placeholder="573001234567" />
+      </div>
+    </div>
+
+    <div class="form-section reveal">
+      <div class="form-section-title">Familiares a alertar (máx. 5)</div>
+      <div id="familyMembers">
+        <div class="family-member">
+          <div class="family-num">1</div>
+          <input type="tel" placeholder="Número WhatsApp familiar (57...)" class="family-input" />
+        </div>
+        <div class="family-member">
+          <div class="family-num">2</div>
+          <input type="tel" placeholder="Número WhatsApp familiar (57...)" class="family-input" />
+        </div>
+        <div class="family-member">
+          <div class="family-num">3</div>
+          <input type="tel" placeholder="Número WhatsApp familiar (57...)" class="family-input" />
+        </div>
+        <div class="family-member">
+          <div class="family-num">4</div>
+          <input type="tel" placeholder="Número WhatsApp familiar (57...)" class="family-input" />
+        </div>
+        <div class="family-member">
+          <div class="family-num">5</div>
+          <input type="tel" placeholder="Número WhatsApp familiar (57...)" class="family-input" />
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--text-3);margin-top:10px;line-height:1.5;">📱 Todos recibirán un WhatsApp con tu ubicación GPS cuando actives el botón de pánico.</p>
+    </div>
+
+    <a href="https://checkout.wompi.co/l/1PYg0P" target="_blank" style="display:block;width:100%;padding:16px;background:linear-gradient(135deg,#C9A84C,#E8C97A);color:#0B1F3A;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:10px;box-shadow:0 4px 20px rgba(201,168,76,0.3);">
+      💳 Pagar $45.000/mes — Activar ahora
+    </a>
+
+    <div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:10px;">
+      <div style="height:1px;background:var(--border);flex:1;"></div>
+      <span style="font-size:11px;color:var(--text-3);">o si ya pagaste</span>
+      <div style="height:1px;background:var(--border);flex:1;"></div>
+    </div>
+
+    <button class="activate-btn reveal" onclick="activarSistema()" style="background:var(--navy);">
+      🛡️ Configurar mi sistema familiar
+    </button>
+    <p style="font-size:11px;color:var(--text-3);text-align:center;margin-top:10px;line-height:1.5;">Tarjeta · PSE · Nequi · Pago 100% seguro con Wompi</p>
+  </div>
+</div>
+
+<!-- SCREEN 2: PANEL DE PÁNICO -->
+<div class="screen" id="screenPanel">
+  <div class="panel-header">
+    <div class="panel-home">Hogar protegido</div>
+    <div class="panel-name" id="panelNombre">Casa Familia</div>
+    <div class="panel-status"><div class="status-blink"></div> Sistema activo · 24/7</div>
+  </div>
+
+  <div class="family-connected">
+    <div class="family-connected-title">👨‍👩‍👧‍👦 Familiares conectados</div>
+    <div class="family-list" id="familyList"></div>
+  </div>
+
+  <div class="panic-center">
+    <button class="panic-main-btn" onclick="openPanic()">
+      <span class="panic-btn-icon">🚨</span>
+      <span class="panic-btn-text">Pánico</span>
+    </button>
+    <p class="panic-hint">Mantén presionado en caso de emergencia<br>Alerta a tu familia + Policía + Legali</p>
+  </div>
+
+  <div class="panel-actions">
+    <a href="https://wa.me/573104571338" target="_blank" class="panel-action-btn">💬 Contactar Legali</a>
+    <button class="panel-action-btn" onclick="editarFamilia()">⚙️ Editar familia</button>
+    <a href="https://checkout.wompi.co/l/1PYg0P" target="_blank" class="panel-action-btn">💳 Mi plan</a>
+  </div>
+</div>
+
+<!-- PANIC MODAL -->
+<div class="panic-overlay" id="panicOverlay">
+  <div class="panic-modal">
+    <span class="panic-big">🚨</span>
+    <h2>¿Confirmar emergencia?</h2>
+    <div class="loc-info" id="locationInfo">📍 Detectando ubicación GPS...</div>
+    <p id="familyAlertText">Se alertará a tu familia, Policía y Legali con tu ubicación exacta.</p>
+    <a id="btnPolicia" href="#" class="panic-action police">📞 Alertar Cuadrante Policía</a>
+    <a id="btn156" href="#" class="panic-action p156">📟 Línea 156 · Policía Nacional</a>
+    <a id="btnFamilia" href="#" class="panic-action wa-family">👨‍👩‍👧‍👦 Alertar a mi familia</a>
+    <a id="btnLegali" href="#" class="panic-action wa-legali">🛡️ Notificar a Legali</a>
+    <span class="panic-cancel" onclick="closePanic()">Cancelar — fue un error</span>
+  </div>
+</div>
+
+<script>
+var familyData = { hogar: '', userName: '', userPhone: '', members: [] };
+
+window.onload = function() {
+  try {
+    var saved = localStorage.getItem('legali_family');
+    if (saved) { familyData = JSON.parse(saved); showPanel(); }
+  } catch(e) {}
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e, i) {
+      if (e.isIntersecting) {
+        setTimeout(function(){ e.target.classList.add('visible'); }, i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(function(el){ observer.observe(el); });
+};
+
+function activarSistema() {
+  var hogar = document.getElementById('hogarNombre').value.trim();
+  var userName = document.getElementById('userName').value.trim();
+  var userPhone = document.getElementById('userPhone').value.trim();
+  if (!hogar || !userName) { alert('Por favor ingresa el nombre del hogar y tu nombre.'); return; }
+  var members = [];
+  document.querySelectorAll('.family-input').forEach(function(i){ if(i.value.trim().length > 5) members.push(i.value.trim()); });
+  familyData = { hogar: hogar, userName: userName, userPhone: userPhone, members: members };
+  try { localStorage.setItem('legali_family', JSON.stringify(familyData)); } catch(e) {}
+  var msg = encodeURIComponent('NUEVO REGISTRO LEGALI FAMILIAR - Hogar: ' + hogar + ' - Responsable: ' + userName + ' - Tel: ' + userPhone + ' - Familiares: ' + members.length);
+  window.open('https://wa.me/573104571338?text=' + msg, '_blank');
+  showPanel();
+}
+
+function showPanel() {
+  document.getElementById('screenRegister').classList.remove('active');
+  document.getElementById('screenPanel').classList.add('active');
+  document.getElementById('panelNombre').textContent = familyData.hogar;
+  var list = document.getElementById('familyList');
+  list.innerHTML = '';
+  if (familyData.members.length === 0) {
+    list.innerHTML = '<div style="font-size:13px;color:rgba(255,255,255,0.3);">Sin familiares registrados</div>';
+  } else {
+    familyData.members.forEach(function(num, i) {
+      var masked = num.slice(-4);
+      list.innerHTML += '<div class="family-item"><div class="family-icon">&#128100;</div><span>Familiar ' + (i+1) + ' &middot; &bull;&bull;&bull;&bull;' + masked + '</span></div>';
+    });
+  }
+}
+
+function editarFamilia() {
+  try { localStorage.removeItem('legali_family'); } catch(e) {}
+  document.getElementById('screenPanel').classList.remove('active');
+  document.getElementById('screenRegister').classList.add('active');
+}
+
+function openPanic() {
+  var time = new Date().toLocaleString('es-CO', {timeZone:'America/Bogota'});
+  document.getElementById('panicOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        var lat = pos.coords.latitude.toFixed(6);
+        var lng = pos.coords.longitude.toFixed(6);
+        var mapsLink = 'https://maps.google.com/?q=' + lat + ',' + lng;
+        buildLinks(mapsLink, time);
+        document.getElementById('locationInfo').innerHTML = '&#128205; <strong>Ubicacion detectada</strong><br><a href="' + mapsLink + '" target="_blank" style="color:#2B6CB0;font-size:11px;">Ver en Google Maps &rarr; ' + lat + ', ' + lng + '</a>';
+      },
+      function() {
+        buildLinks(null, time);
+        document.getElementById('locationInfo').innerHTML = '&#9888;&#65039; GPS no disponible &mdash; activa la ubicacion en tu celular';
+      },
+      { timeout: 6000, enableHighAccuracy: true }
+    );
+  } else {
+    buildLinks(null, time);
+    document.getElementById('locationInfo').textContent = 'GPS no disponible en este dispositivo';
+  }
+}
+
+function buildLinks(mapsLink, time) {
+  var hogar = familyData.hogar || 'Hogar Legali';
+  var locText = mapsLink ? ' GPS: ' + mapsLink : ' Sin GPS';
+  var smsBase = 'EMERGENCIA LEGALI - Hogar: ' + hogar + locText + ' - Hora: ' + time + ' - SOLICITA APOYO INMEDIATO';
+  document.getElementById('btnPolicia').href = 'sms:156&body=' + encodeURIComponent(smsBase);
+  document.getElementById('btn156').href = 'sms:156&body=' + encodeURIComponent(smsBase);
+  var waLegaliMsg = 'ALERTA PANICO LEGALI - Hogar: ' + hogar + ' - Responsable: ' + (familyData.userName||'') + locText + ' - Hora: ' + time + ' - VERIFICAR INMEDIATAMENTE';
+  document.getElementById('btnLegali').href = 'https://wa.me/573104571338?text=' + encodeURIComponent(waLegaliMsg);
+  var waFamilyMsg = 'ALERTA EMERGENCIA FAMILIAR - ' + (familyData.userName||'Tu familiar') + ' activo el boton de panico Legali. Hogar: ' + hogar + locText + ' Hora: ' + time + ' - Verificar inmediatamente.';
+  if (familyData.members && familyData.members.length > 0) {
+    document.getElementById('btnFamilia').href = 'https://wa.me/' + familyData.members[0] + '?text=' + encodeURIComponent(waFamilyMsg);
+    document.getElementById('familyAlertText').textContent = 'Se alertara a ' + familyData.members.length + ' familiar(es), Policia y Legali con tu ubicacion.';
+  } else {
+    document.getElementById('btnFamilia').href = 'https://wa.me/573104571338?text=' + encodeURIComponent(waFamilyMsg);
+    document.getElementById('familyAlertText').textContent = 'Se alertara a la Policia y al equipo Legali con tu ubicacion.';
+  }
+}
+
+function closePanic() {
+  document.getElementById('panicOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+</script>
+</body>
+</html>
