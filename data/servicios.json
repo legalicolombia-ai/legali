@@ -1,0 +1,18 @@
+[
+    {
+        "nombre": "Agente IA RRHH",
+        "tipo": "captacion",
+        "peso_base": 85,
+        "segmento": "Empresas / Emprendedores",
+        "rentabilidad": 70,
+        "prioridad": 90
+    },
+    {
+        "nombre": "Asesoría Jurídica 24/7",
+        "tipo": "premium",
+        "peso_base": 95,
+        "segmento": "Pymes",
+        "rentabilidad": 100,
+        "prioridad": 100
+    }
+]

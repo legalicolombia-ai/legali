@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "titulo": "Establecimiento con Botón de Pánico",
+    "precio": "$35.000",
+    "descripcion": "Un toque alerta al cuadrante de Policía más cercano y al equipo Legali con GPS exacto.",
+    "color": "#1E3A8A",
+    "enfoques": [
+      "Seguridad para tu negocio",
+      "Respuesta inmediata",
+      "Tecnología inteligente",
+      "Protección 24/7",
+      "Prevención del delito"
+    ]
+  },
+  {
+    "id": 2,
+    "titulo": "Botón de Pánico Familiar",
+    "precio": "$45.000",
+    "descripcion": "Protege a toda tu familia con alertas GPS en tiempo real.",
+    "color": "#0F766E",
+    "enfoques": [
+      "Protege a tu familia",
+      "Seguridad en segundos",
+      "GPS en tiempo real",
+      "Respuesta inmediata",
+      "Tranquilidad para todos"
+    ]
+  },
+  {
+    "id": 3,
+    "titulo": "Asesoría Jurídica 24/7",
+    "precio": "$300.000",
+    "descripcion": "Consultas jurídicas ilimitadas con IA especializada en normativa colombiana.",
+    "color": "#7C2D12",
+    "enfoques": [
+      "Asesoría inmediata",
+      "Abogados expertos",
+      "Protección legal",
+      "Cumplimiento normativo",
+      "Respaldo jurídico"
+    ]
+  },
+  {
+    "id": 4,
+    "titulo": "Agente IA Recursos Humanos",
+    "precio": "$200.000",
+    "descripcion": "Procedimientos disciplinarios laborales completos asistidos por IA.",
+    "color": "#4C1D95",
+    "enfoques": [
+      "Automatiza RRHH",
+      "Cumple el CST",
+      "Reduce riesgos",
+      "Procesos disciplinarios",
+      "IA para empresas"
+    ]
+  }
+]

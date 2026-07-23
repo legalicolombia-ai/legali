@@ -1,0 +1,25 @@
+{
+    "id": 25,
+
+    "fecha": "2026-07-22",
+
+    "producto": "Asesoría Jurídica 24/7",
+
+    "categoria": "Premium",
+
+    "tipo_contenido": "conversion",
+
+    "formato": "Reel",
+
+    "segmento": "Pymes",
+
+    "objetivo": "Venta",
+
+    "resultado": {
+        "likes": 0,
+        "comentarios": 0,
+        "guardados": 0,
+        "compartidos": 0,
+        "clientes_generados": 0
+    }
+}
