@@ -2,26 +2,16 @@
 LEGALI BRAIN
 
 Director Comercial IA
-
-Responsabilidad:
-
-- Analizar el negocio.
-- Priorizar servicios.
-- Solicitar la mejor estrategia comercial.
-
-Nunca genera imágenes.
-Nunca publica.
-
 """
 
-from brain.decision_engine import DecisionEngine
+from brain.commercial_intelligence import CommercialIntelligence
 
 
 class DirectorComercial:
 
     def __init__(self):
 
-        self.engine = DecisionEngine()
+        self.inteligencia = CommercialIntelligence()
 
     def analizar_negocio(self):
 
@@ -35,11 +25,9 @@ class DirectorComercial:
 
     def solicitar_estrategia(self):
 
-        print("🧠 Consultando Decision Engine...\n")
+        print("🧠 Consultando Commercial Intelligence...\n")
 
-        estrategia = self.engine.ejecutar_reunion_consejo()
-
-        return estrategia
+        return self.inteligencia.generar_plan()
 
     def ejecutar(self):
 

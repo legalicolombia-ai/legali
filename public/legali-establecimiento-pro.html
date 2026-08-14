@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Legali — Establecimiento Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:ital,wght@0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08090A;--surface:#0F1117;--surface-2:#1A1D27;--surface-3:#252836;
+  --white:#FAFAFA;--gray:#8A8F9E;--gray-2:#C4C7D0;
+  --border:rgba(255,255,255,0.07);--border-2:rgba(255,255,255,0.04);
+  --gold:#F5C842;--gold-2:#E8B830;--gold-dim:rgba(245,200,66,0.08);
+  --red:#FF4444;--red-dim:rgba(255,68,68,0.08);--red-border:rgba(255,68,68,0.2);
+  --green:#22C55E;--green-dim:rgba(34,197,94,0.08);--green-border:rgba(34,197,94,0.2);
+  --blue:#3B82F6;--blue-dim:rgba(59,130,246,0.08);
+  --warn:#F59E0B;--warn-dim:rgba(245,158,11,0.08);--warn-border:rgba(245,158,11,0.2);
+  --purple:#8B5CF6;
+  --radius:14px;--radius-sm:10px;--radius-lg:20px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--white);min-height:100vh;overflow-x:hidden;line-height:1.5;}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,28px);background:rgba(8,9,10,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;}
+.logo-mark{width:32px;height:32px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.logo-mark svg{width:17px;height:17px;}
+.logo-name{font-family:"Fraunces",serif;font-size:21px;color:var(--white);letter-spacing:-0.02em;}
+.nav-pill{font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(245,200,66,0.18);}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:calc(100vh - 56px);}
+.screen.active{display:flex;flex-direction:column;}
+
+/* ══════════════════════════════════
+   SELECTOR
+══════════════════════════════════ */
+#screenSelector{background:var(--bg);align-items:center;justify-content:center;padding:40px 20px;text-align:center;}
+.sel-glow{position:fixed;top:0;left:50%;transform:translateX(-50%);width:500px;height:300px;background:radial-gradient(ellipse,rgba(245,200,66,0.05) 0%,transparent 70%);pointer-events:none;}
+.sel-chip{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:600;color:var(--gray);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:24px;}
+.chip-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.sel-h{font-family:"Fraunces",serif;font-size:clamp(32px,7vw,52px);font-weight:900;line-height:1.05;letter-spacing:-0.04em;margin-bottom:10px;}
+.sel-h .gold{color:var(--gold);}
+.sel-h .italic{font-style:italic;}
+.sel-sub{font-size:14px;color:var(--gray);margin-bottom:36px;line-height:1.65;max-width:360px;}
+.sel-btns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:400px;}
+.sel-btn{display:flex;align-items:center;gap:14px;padding:18px 20px;border-radius:var(--radius);border:none;cursor:pointer;text-align:left;font-family:"Inter",sans-serif;transition:all 0.15s;position:relative;overflow:hidden;}
+.sel-btn:active{transform:scale(0.98);}
+.sel-btn.owner{background:var(--gold);color:#0a0a0a;}
+.sel-btn.owner:hover{background:var(--gold-2);}
+.sel-btn.inspector{background:var(--surface-2);border:1px solid var(--border);color:var(--white);}
+.sel-btn.inspector:hover{background:var(--surface-3);border-color:rgba(255,255,255,0.12);}
+.sel-btn.panic{background:var(--red);color:#fff;box-shadow:0 4px 24px rgba(255,68,68,0.25);}
+.sel-btn.panic:hover{background:#DD2222;}
+.sel-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;}
+.owner .sel-icon{background:rgba(0,0,0,0.12);}
+.inspector .sel-icon{background:var(--gold-dim);border:1px solid rgba(245,200,66,0.15);}
+.panic .sel-icon{background:rgba(255,255,255,0.15);}
+.sel-text{flex:1;}
+.sel-label{font-size:15px;font-weight:700;display:block;margin-bottom:2px;}
+.sel-desc{font-size:12px;opacity:0.65;}
+.sel-arr{font-size:18px;opacity:0.5;flex-shrink:0;}
+
+/* ══════════════════════════════════
+   OWNER PANEL
+══════════════════════════════════ */
+#screenOwner{background:var(--bg);}
+.owner-top{background:var(--surface);padding:20px clamp(16px,4vw,28px);border-bottom:1px solid var(--border);}
+.owner-store{font-family:"Fraunces",serif;font-size:22px;font-weight:700;color:var(--white);letter-spacing:-0.02em;margin-bottom:2px;}
+.owner-meta{font-size:12px;color:var(--gray);}
+.owner-body{padding:clamp(16px,4vw,24px);flex:1;}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.stat-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 14px;text-align:center;}
+.stat-val{font-family:"Fraunces",serif;font-size:30px;font-weight:900;display:block;letter-spacing:-0.03em;}
+.stat-lbl{font-size:11px;color:var(--gray);margin-top:2px;font-weight:500;}
+.stat-ok .stat-val{color:var(--green);}
+.stat-warn .stat-val{color:var(--warn);}
+.stat-exp .stat-val{color:var(--red);}
+
+/* Alert banners */
+.alert-banner{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:var(--radius-sm);font-size:13px;line-height:1.55;margin-bottom:12px;}
+.alert-banner.err{background:var(--red-dim);border:1px solid var(--red-border);color:#FCA5A5;}
+.alert-banner.warn{background:var(--warn-dim);border:1px solid var(--warn-border);color:#FCD34D;}
+.alert-banner.ok{background:var(--green-dim);border:1px solid var(--green-border);color:#86EFAC;}
+.alert-ico{font-size:15px;flex-shrink:0;margin-top:1px;}
+
+/* Section header */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.sec-lbl{font-size:13px;font-weight:600;color:var(--gray-2);}
+.btn-add{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;font-family:"Inter",sans-serif;font-size:12px;font-weight:600;color:var(--white);cursor:pointer;transition:all 0.12s;}
+.btn-add:hover{background:var(--surface-3);border-color:rgba(255,255,255,0.12);}
+
+/* Doc list */
+.docs-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.doc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;transition:background 0.12s;}
+.doc-card:hover{background:var(--surface-2);}
+.doc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.doc-dot.ok{background:var(--green);}
+.doc-dot.warn{background:var(--warn);}
+.doc-dot.expired{background:var(--red);}
+.doc-dot.pending{background:var(--gray);}
+.doc-emoji{font-size:20px;flex-shrink:0;}
+.doc-info{flex:1;min-width:0;}
+.doc-name{font-size:14px;font-weight:600;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.doc-meta{font-size:11px;color:var(--gray);margin-top:2px;}
+.doc-tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0;}
+.doc-tag.ok{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);}
+.doc-tag.warn{background:var(--warn-dim);color:var(--warn);border:1px solid var(--warn-border);}
+.doc-tag.expired{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border);}
+.doc-tag.pending{background:var(--surface-3);color:var(--gray);border:1px solid var(--border);}
+.doc-acts{display:flex;gap:6px;flex-shrink:0;}
+.doc-act{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.12s;}
+.doc-act:hover{background:var(--surface-3);border-color:rgba(255,255,255,0.12);}
+
+/* Empty state */
+.empty{text-align:center;padding:40px 20px;}
+.empty-ico{font-size:40px;margin-bottom:12px;display:block;opacity:0.4;}
+.empty-t{font-size:14px;font-weight:600;color:var(--gray-2);margin-bottom:6px;}
+.empty-d{font-size:12px;color:var(--gray);line-height:1.6;}
+
+/* Bottom actions */
+.bottom-acts{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.btn-full{width:100%;padding:14px;border:none;border-radius:var(--radius);font-family:"Inter",sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-full:active{transform:scale(0.98);}
+.btn-full.green{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);}
+.btn-full.green:hover{background:var(--green);color:#fff;}
+.btn-full.red{background:var(--red);color:#fff;box-shadow:0 4px 20px rgba(255,68,68,0.2);}
+.btn-full.red:hover{background:#DD2222;}
+.btn-full.ghost{background:transparent;border:1px solid var(--border);color:var(--gray);}
+.btn-full.ghost:hover{background:var(--surface);}
+
+/* ══════════════════════════════════
+   INSPECTOR VIEW
+══════════════════════════════════ */
+#screenInspector{background:var(--bg);}
+.insp-top{background:var(--surface);padding:20px clamp(16px,4vw,28px);border-bottom:1px solid var(--border);}
+.insp-verified{display:inline-flex;align-items:center;gap:6px;background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:12px;}
+.insp-store{font-family:"Fraunces",serif;font-size:22px;font-weight:700;color:var(--white);margin-bottom:2px;}
+.insp-meta{font-size:12px;color:var(--gray);}
+.insp-body{padding:clamp(16px,4vw,24px);flex:1;}
+.insp-notice{background:var(--blue-dim);border:1px solid rgba(59,130,246,0.2);border-radius:var(--radius-sm);padding:14px;font-size:13px;color:#93C5FD;line-height:1.6;margin-bottom:20px;}
+.insp-doc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.insp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.insp-emoji{font-size:20px;flex-shrink:0;}
+.insp-info{flex:1;}
+.insp-name{font-size:14px;font-weight:600;color:var(--white);}
+.insp-date{font-size:11px;color:var(--gray);margin-top:2px;}
+.insp-tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;flex-shrink:0;}
+.btn-wa{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:15px;background:#25D366;color:#fff;border:none;border-radius:var(--radius);font-family:"Inter",sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;margin-top:16px;transition:background 0.15s;}
+.btn-wa:hover{background:#1DA851;}
+
+/* ══════════════════════════════════
+   MODALS
+══════════════════════════════════ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.sheet{background:var(--surface);border-radius:22px 22px 0 0;padding:24px 20px 40px;width:100%;max-width:520px;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);max-height:92vh;overflow-y:auto;}
+.overlay.open .sheet{transform:translateY(0);}
+.handle{width:36px;height:4px;background:var(--surface-3);border-radius:2px;margin:0 auto 22px;}
+.sheet-title{font-family:"Fraunces",serif;font-size:22px;color:var(--white);margin-bottom:6px;}
+.sheet-sub{font-size:13px;color:var(--gray);margin-bottom:20px;line-height:1.6;}
+
+/* Form */
+.fg{margin-bottom:14px;}
+.fg label{display:block;font-size:12px;font-weight:600;color:var(--gray-2);margin-bottom:5px;letter-spacing:0.02em;}
+.fg input,.fg select{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:10px;font-family:"Inter",sans-serif;font-size:15px;color:var(--white);background:var(--surface-2);outline:none;transition:border-color 0.15s;-webkit-appearance:none;}
+.fg input:focus,.fg select:focus{border-color:var(--gold);}
+.fg input::placeholder{color:var(--gray);}
+.fg select option{background:var(--surface-2);}
+.file-drop{border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:var(--surface-2);transition:all 0.15s;}
+.file-drop:hover{border-color:var(--gold);background:var(--gold-dim);}
+.file-ico{font-size:28px;margin-bottom:8px;display:block;}
+.file-txt{font-size:13px;color:var(--gray);}
+.file-sub{font-size:11px;color:var(--gray);margin-top:4px;opacity:0.6;}
+.btn-submit{width:100%;padding:15px;background:var(--gold);color:#0a0a0a;border:none;border-radius:var(--radius);font-family:"Inter",sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:all 0.15s;}
+.btn-submit:hover{background:var(--gold-2);}
+.btn-cancel{display:block;text-align:center;margin-top:12px;font-size:13px;color:var(--gray);cursor:pointer;}
+.btn-cancel:hover{color:var(--white);}
+
+/* Panic overlay */
+.panic-ovl{position:fixed;inset:0;background:rgba(200,30,30,0.85);backdrop-filter:blur(10px);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.panic-ovl.open{opacity:1;pointer-events:all;}
+.panic-box{background:var(--white);border-radius:20px;padding:28px 22px;width:100%;max-width:360px;text-align:center;transform:scale(0.9);transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);}
+.panic-ovl.open .panic-box{transform:scale(1);}
+.panic-ico{font-size:52px;display:block;margin-bottom:10px;animation:shake 1s infinite;}
+@keyframes shake{0%,90%,100%{transform:rotate(0);}92%{transform:rotate(-8deg);}94%{transform:rotate(8deg);}96%{transform:rotate(-8deg);}98%{transform:rotate(8deg);}}
+.panic-box h2{font-family:"Fraunces",serif;font-size:22px;color:#C53030;margin-bottom:8px;}
+.panic-loc{font-size:11px;color:#4A5C72;background:#F0F4F8;border-radius:8px;padding:8px 12px;margin-bottom:14px;line-height:1.5;}
+.panic-box p{font-size:13px;color:#4A5C72;margin-bottom:18px;line-height:1.6;}
+.pa{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:14px;border-radius:12px;border:none;font-family:"Inter",sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;margin-bottom:10px;transition:transform 0.1s;}
+.pa:active{transform:scale(0.97);}
+.pa-pol{background:#1A3A6E;color:#fff;}
+.pa-156{background:#2C7A7B;color:#fff;}
+.pa-leg{background:#0B1F3A;color:#fff;}
+.pa-cancel{display:block;margin-top:10px;font-size:13px;color:#8A9BAE;cursor:pointer;text-decoration:underline;}
+
+/* WA float */
+.wa{position:fixed;bottom:20px;right:20px;z-index:150;width:52px;height:52px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:0 4px 20px rgba(37,211,102,0.35);transition:transform 0.2s;}
+.wa:hover{transform:scale(1.1);}
+
+@media(max-width:400px){.stats-grid{grid-template-columns:1fr 1fr;}.stat-ok{grid-column:span 2;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L4 6v6c0 5.25 3.5 10 8 12 4.5-2 8-6.75 8-12V6L12 2z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <span class="logo-name">Legali</span>
+  </a>
+  <span class="nav-pill" id="navBadge">🏪 Establecimiento Pro</span>
+</nav>
+
+<!-- ══ SELECTOR ══ -->
+<div class="screen active" id="screenSelector">
+  <div class="sel-glow"></div>
+  <div class="sel-chip"><div class="chip-dot"></div>Sistema de protección activo</div>
+  <h1 class="sel-h">Establecimiento<br><span class="italic gold">Protegido.</span></h1>
+  <p class="sel-sub">Gestión documental, protección legal y seguridad — todo en un sistema.</p>
+  <div class="sel-btns">
+    <button class="sel-btn owner" onclick="showScreen('owner')">
+      <div class="sel-icon">👤</div>
+      <div class="sel-text">
+        <span class="sel-label">Soy el dueño / administrador</span>
+        <span class="sel-desc">Gestionar documentos y alertas</span>
+      </div>
+      <span class="sel-arr">→</span>
+    </button>
+    <button class="sel-btn inspector" onclick="showScreen('inspector')">
+      <div class="sel-icon">⚖️</div>
+      <div class="sel-text">
+        <span class="sel-label">Soy inspector o autoridad</span>
+        <span class="sel-desc">Policía · SIC · Alcaldía · DIAN</span>
+      </div>
+      <span class="sel-arr">→</span>
+    </button>
+    <button class="sel-btn panic" onclick="openPanic()">
+      <div class="sel-icon">🚨</div>
+      <div class="sel-text">
+        <span class="sel-label">Botón de Pánico</span>
+        <span class="sel-desc">Emergencia · Hurto · Riesgo inmediato</span>
+      </div>
+      <span class="sel-arr">→</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══ OWNER PANEL ══ -->
+<div class="screen" id="screenOwner">
+  <div class="owner-top">
+    <div class="owner-store" id="ownerStoreName">Mi Establecimiento</div>
+    <div class="owner-meta">Panel de gestión documental · Legali Pro</div>
+  </div>
+  <div class="owner-body">
+    <div class="stats-grid">
+      <div class="stat-tile stat-ok"><span class="stat-val" id="statOk">0</span><span class="stat-lbl">Vigentes</span></div>
+      <div class="stat-tile stat-warn"><span class="stat-val" id="statWarn">0</span><span class="stat-lbl">Por vencer</span></div>
+      <div class="stat-tile stat-exp"><span class="stat-val" id="statExp">0</span><span class="stat-lbl">Vencidos</span></div>
+    </div>
+    <div id="alertsBox"></div>
+    <div class="sec-hd">
+      <span class="sec-lbl">Documentos del establecimiento</span>
+      <button class="btn-add" onclick="openAddDoc()">+ Agregar</button>
+    </div>
+    <div class="docs-list" id="docsList">
+      <div class="empty">
+        <span class="empty-ico">📂</span>
+        <div class="empty-t">Sin documentos aún</div>
+        <div class="empty-d">Agrega los documentos de tu establecimiento. Legali te avisará antes de que venzan.</div>
+      </div>
+    </div>
+    <div class="bottom-acts">
+      <button class="btn-full green" onclick="notifyLegali()">📤 Enviar documentos a Legali para verificación</button>
+      <button class="btn-full red" onclick="openPanic()">🚨 Botón de Pánico</button>
+      <button class="btn-full ghost" onclick="showScreen('selector')">← Volver al inicio</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ INSPECTOR ══ -->
+<div class="screen" id="screenInspector">
+  <div class="insp-top">
+    <div class="insp-verified">✓ Verificado por Legali</div>
+    <div class="insp-store" id="inspStore">Establecimiento Legali</div>
+    <div class="insp-meta">Bogotá, Colombia · Sistema Legali Pro</div>
+  </div>
+  <div class="insp-body">
+    <div class="insp-notice">⚖️ <strong>Estimado inspector:</strong> Este establecimiento opera bajo el sistema <strong>Legali</strong>. Los documentos han sido verificados por nuestro equipo jurídico. Ante cualquier diligencia, el establecimiento ejerce su derecho a asesoría legal previa.</div>
+    <div class="sec-hd">
+      <span class="sec-lbl">Documentos del establecimiento</span>
+      <a href="https://wa.me/573104571338" target="_blank" class="btn-add">💬 Contactar Legali</a>
+    </div>
+    <div id="inspDocsList">
+      <div class="empty">
+        <span class="empty-ico">📂</span>
+        <div class="empty-t">Documentos en proceso de registro</div>
+        <div class="empty-d">El establecimiento está registrando su documentación en el sistema Legali.</div>
+      </div>
+    </div>
+    <a class="btn-wa" href="https://wa.me/573104571338?text=Hola%2C+soy+inspector+visitando+un+establecimiento+con+sistema+Legali.+Requiero+asistencia." target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      Hablar con asesor Legali
+    </a>
+    <button class="btn-full ghost" style="margin-top:10px;" onclick="showScreen('selector')">← Volver</button>
+  </div>
+</div>
+
+<!-- ══ MODAL: AGREGAR DOC ══ -->
+<div class="overlay" id="addDocModal">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sheet-title">Agregar documento</div>
+    <div class="sheet-sub">Sube el documento y define su vencimiento. Legali te avisará antes de que expire.</div>
+    <div class="fg">
+      <label>Tipo de documento *</label>
+      <select id="docType" onchange="toggleCustom()">
+        <option value="">Selecciona...</option>
+        <option value="Matrícula Mercantil">📋 Matrícula Mercantil</option>
+        <option value="Certificado Uso de Suelo">🏗️ Certificado Uso de Suelo</option>
+        <option value="Concepto Sanitario">🏥 Concepto Sanitario</option>
+        <option value="Permiso Manipulación Alimentos">🍽️ Permiso Manipulación Alimentos</option>
+        <option value="Concepto Bomberos">🚒 Concepto de Bomberos</option>
+        <option value="Sayco & Acinpro">🎵 Sayco & Acinpro</option>
+        <option value="RUT">📄 RUT</option>
+        <option value="Cámara de Comercio">🏛️ Cámara de Comercio</option>
+        <option value="Licencia de Funcionamiento">✅ Licencia de Funcionamiento</option>
+        <option value="Certificado Retie">⚡ Certificado Retie</option>
+        <option value="Otro">📎 Otro documento</option>
+      </select>
+    </div>
+    <div class="fg" id="customDocFg" style="display:none;">
+      <label>Nombre del documento *</label>
+      <input type="text" id="docCustomName" placeholder="Ej: Permiso especial de operación" />
+    </div>
+    <div class="fg">
+      <label>Fecha de vencimiento *</label>
+      <input type="date" id="docExpiry" />
+    </div>
+    <div class="fg">
+      <label>Número o código</label>
+      <input type="text" id="docNumber" placeholder="Ej: CM-2024-123456" />
+    </div>
+    <div class="fg">
+      <label>Adjuntar documento</label>
+      <div class="file-drop" onclick="document.getElementById('docFile').click()">
+        <span class="file-ico">📎</span>
+        <div class="file-txt" id="docFileLbl">Toca para adjuntar</div>
+        <div class="file-sub">PDF · JPG · PNG · Máx. 10MB</div>
+      </div>
+      <input type="file" id="docFile" accept=".pdf,image/*" style="display:none" onchange="onDocFile(this)">
+    </div>
+    <button class="btn-submit" onclick="saveDoc()">✓ Guardar documento</button>
+    <span class="btn-cancel" onclick="closeOverlay('addDocModal')">Cancelar</span>
+  </div>
+</div>
+
+<!-- ══ MODAL: VER DOC ══ -->
+<div class="overlay" id="viewDocModal">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sheet-title" id="viewDocTitle">Documento</div>
+    <div id="viewDocBody"></div>
+    <span class="btn-cancel" onclick="closeOverlay('viewDocModal')">Cerrar</span>
+  </div>
+</div>
+
+<!-- ══ PANIC ══ -->
+<div class="panic-ovl" id="panicOvl">
+  <div class="panic-box">
+    <span class="panic-ico">🚨</span>
+    <h2>¿Confirmar emergencia?</h2>
+    <div class="panic-loc" id="panicLoc">📍 Detectando ubicación GPS...</div>
+    <p>Se enviará alerta con ubicación exacta al cuadrante de Policía y al equipo Legali.</p>
+    <a id="btnPol" href="#" class="pa pa-pol">📞 Alertar Cuadrante Policía</a>
+    <a id="btn156" href="#" class="pa pa-156">📟 Línea 156 · Policía Nacional</a>
+    <a id="btnLeg" href="#" class="pa pa-leg">🛡️ Notificar a Legali</a>
+    <span class="pa-cancel" onclick="closeOverlay('panicOvl')">Cancelar — fue un error</span>
+  </div>
+</div>
+
+<!-- WA -->
+<a class="wa" href="https://wa.me/573104571338" target="_blank">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+</a>
+
+<script>
+var p=new URLSearchParams(location.search);
+var storeName=decodeURIComponent(p.get('negocio')||'Mi Establecimiento');
+var cuadrante=p.get('cuadrante')||'156';
+var docs=[];
+
+window.onload=function(){
+  document.getElementById('ownerStoreName').textContent=storeName;
+  document.getElementById('inspStore').textContent=storeName;
+  document.getElementById('docExpiry').min=new Date().toISOString().split('T')[0];
+  try{var s=localStorage.getItem('legali_docs_'+storeName);if(s){docs=JSON.parse(s);renderDocs();}}catch(e){}
+};
+
+function showScreen(n){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  var id='screen'+n.charAt(0).toUpperCase()+n.slice(1);
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  // Refresh docs when switching to inspector
+  if(n==='inspector'){renderDocs();}
+}
+
+function saveDocs(){try{localStorage.setItem('legali_docs_'+storeName,JSON.stringify(docs));}catch(e){}}
+
+function getStatus(exp){
+  if(!exp)return'pending';
+  var d=Math.ceil((new Date(exp)-new Date())/(1000*60*60*24));
+  if(d<0)return'expired';
+  if(d<=30)return'warn';
+  return'ok';
+}
+
+function getLabel(status,exp){
+  if(!exp||status==='pending')return'Sin fecha';
+  var d=Math.ceil((new Date(exp)-new Date())/(1000*60*60*24));
+  if(d<0)return'Vencido hace '+Math.abs(d)+' días';
+  if(d===0)return'Vence hoy';
+  if(d<=30)return'Vence en '+d+' días';
+  return'Vigente · '+new Date(exp+'T12:00:00').toLocaleDateString('es-CO',{day:'numeric',month:'short',year:'numeric'});
+}
+
+var ICONS={'Matrícula Mercantil':'📋','Certificado Uso de Suelo':'🏗️','Concepto Sanitario':'🏥','Permiso Manipulación Alimentos':'🍽️','Concepto Bomberos':'🚒','Sayco & Acinpro':'🎵','RUT':'📄','Cámara de Comercio':'🏛️','Licencia de Funcionamiento':'✅','Certificado Retie':'⚡'};
+var COLORS={ok:'var(--green)',warn:'var(--warn)',expired:'var(--red)',pending:'var(--gray)'};
+var TAG_STYLE={ok:'background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);',warn:'background:var(--warn-dim);color:var(--warn);border:1px solid var(--warn-border);',expired:'background:var(--red-dim);color:var(--red);border:1px solid var(--red-border);',pending:'background:var(--surface-3);color:var(--gray);'};
+var TAG_LABEL={ok:'✓ Vigente',warn:'⚠ Por vencer',expired:'✕ Vencido',pending:'— Pendiente'};
+
+function renderDocs(){
+  var list=document.getElementById('docsList');
+  var insp=document.getElementById('inspDocsList');
+  var ok=0,warn=0,exp=0;
+  if(!docs.length){
+    list.innerHTML='<div class="empty"><span class="empty-ico">📂</span><div class="empty-t">Sin documentos aún</div><div class="empty-d">Agrega los documentos de tu establecimiento. Legali te avisará antes de que venzan.</div></div>';
+    insp.innerHTML='<div class="empty"><span class="empty-ico">📂</span><div class="empty-t">Documentos en proceso de registro</div></div>';
+    document.getElementById('statOk').textContent=0;
+    document.getElementById('statWarn').textContent=0;
+    document.getElementById('statExp').textContent=0;
+    document.getElementById('alertsBox').innerHTML='';
+    return;
+  }
+  list.innerHTML='';insp.innerHTML='';
+  docs.forEach(function(doc,i){
+    var st=getStatus(doc.expiry);
+    var lbl=getLabel(st,doc.expiry);
+    var ico=ICONS[doc.type]||'📎';
+    if(st==='ok')ok++;else if(st==='warn')warn++;else if(st==='expired')exp++;
+    list.innerHTML+='<div class="doc-card"><div class="doc-dot '+st+'" style="background:'+COLORS[st]+';"></div><div class="doc-emoji">'+ico+'</div><div class="doc-info"><div class="doc-name">'+(doc.type)+(doc.customName?' — '+doc.customName:'')+'</div><div class="doc-meta">'+(doc.number?'N° '+doc.number+' · ':'')+lbl+'</div></div><div class="doc-tag '+st+'" style="'+TAG_STYLE[st]+'">'+TAG_LABEL[st]+'</div><div class="doc-acts"><div class="doc-act" onclick="viewDoc('+i+')">👁</div><div class="doc-act" onclick="deleteDoc('+i+')">🗑</div></div></div>';
+    insp.innerHTML+='<div class="insp-doc"><div class="insp-dot" style="width:8px;height:8px;border-radius:50%;background:'+COLORS[st]+';flex-shrink:0;"></div><div class="insp-emoji">'+ico+'</div><div class="insp-info"><div class="insp-name">'+doc.type+'</div><div class="insp-date">'+lbl+'</div></div><span class="insp-tag" style="'+TAG_STYLE[st]+'">'+TAG_LABEL[st]+'</span></div>';
+  });
+  document.getElementById('statOk').textContent=ok;
+  document.getElementById('statWarn').textContent=warn;
+  document.getElementById('statExp').textContent=exp;
+  var alerts='';
+  if(exp>0)alerts+='<div class="alert-banner err"><span class="alert-ico">🔴</span><div><strong>'+exp+' documento(s) vencido(s)</strong> — Renuévalos para evitar sanciones.</div></div>';
+  if(warn>0)alerts+='<div class="alert-banner warn"><span class="alert-ico">⚠️</span><div><strong>'+warn+' documento(s) por vencer pronto</strong> — Legali te notificará.</div></div>';
+  if(!exp&&!warn&&docs.length)alerts+='<div class="alert-banner ok"><span class="alert-ico">✅</span><div><strong>Todos los documentos vigentes</strong> — Tu establecimiento está al día.</div></div>';
+  document.getElementById('alertsBox').innerHTML=alerts;
+}
+
+function toggleCustom(){document.getElementById('customDocFg').style.display=document.getElementById('docType').value==='Otro'?'block':'none';}
+
+function onDocFile(inp){var f=inp.files[0];if(f)document.getElementById('docFileLbl').textContent='✅ '+f.name+' ('+( f.size/1024).toFixed(0)+' KB)';}
+
+function openAddDoc(){
+  ['docType','docExpiry','docNumber','docCustomName'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('docFileLbl').textContent='Toca para adjuntar';
+  document.getElementById('customDocFg').style.display='none';
+  openOverlay('addDocModal');
+}
+
+function saveDoc(){
+  var type=document.getElementById('docType').value;
+  var custom=document.getElementById('docCustomName').value.trim();
+  var expiry=document.getElementById('docExpiry').value;
+  var number=document.getElementById('docNumber').value.trim();
+  var file=document.getElementById('docFile').files[0];
+  if(!type){alert('Selecciona el tipo de documento.');return;}
+  if(!expiry){alert('Ingresa la fecha de vencimiento.');return;}
+  docs.push({type:type==='Otro'?(custom||'Documento personalizado'):type,customName:type==='Otro'?custom:'',expiry:expiry,number:number,fileName:file?file.name:null,addedAt:new Date().toISOString()});
+  saveDocs();renderDocs();closeOverlay('addDocModal');
+  document.getElementById('docFile').value='';
+}
+
+function viewDoc(i){
+  var doc=docs[i];var st=getStatus(doc.expiry);var lbl=getLabel(st,doc.expiry);
+  document.getElementById('viewDocTitle').textContent=doc.type;
+  var docHtml='<div style="background:var(--surface-2);border-radius:10px;padding:16px;margin-bottom:16px;">';
+  docHtml+='<div style="font-size:13px;color:var(--gray-2);margin-bottom:8px;"><strong style="color:var(--white);">Estado:</strong> '+lbl+'</div>';
+  if(doc.number)docHtml+='<div style="font-size:13px;color:var(--gray-2);margin-bottom:8px;"><strong style="color:var(--white);">Número:</strong> '+doc.number+'</div>';
+  if(doc.expiry)docHtml+='<div style="font-size:13px;color:var(--gray-2);margin-bottom:8px;"><strong style="color:var(--white);">Vence:</strong> '+new Date(doc.expiry+'T12:00:00').toLocaleDateString("es-CO",{day:"numeric",month:"long",year:"numeric"})+'</div>';
+  if(doc.fileName)docHtml+='<div style="font-size:13px;color:var(--gray-2);"><strong style="color:var(--white);">Archivo:</strong> '+doc.fileName+'</div>';
+  docHtml+='</div>';
+  docHtml+='<button id="deleteBtnDoc" style="width:100%;padding:13px;background:var(--red-dim);color:var(--red);border:1px solid var(--red-border);border-radius:10px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer;">🗑 Eliminar documento</button>';
+  document.getElementById('viewDocBody').innerHTML=docHtml;
+  document.getElementById('deleteBtnDoc').onclick=function(){deleteDoc(i);};
+  openOverlay('viewDocModal');
+}
+
+function deleteDoc(i){
+  docs.splice(i,1);
+  saveDocs();
+  renderDocs();
+  // Close any open modal
+  closeOverlay('viewDocModal');
+}
+
+function notifyLegali(){
+  var s=docs.map(function(d,i){return(i+1)+'. '+d.type+(d.expiry?' — Vence: '+d.expiry:'')+(d.fileName?' ('+d.fileName+')':'');}).join('\n');
+  var msg='📁 DOCUMENTOS LEGALI\n\nEstablecimiento: '+storeName+'\n\n'+(s||'Sin documentos aún')+'\n\nSolicito verificación del equipo Legali.';
+  window.open('https://wa.me/573104571338?text='+encodeURIComponent(msg),'_blank');
+}
+
+function openPanic(){
+  openOverlay('panicOvl');
+  var time=new Date().toLocaleString('es-CO',{timeZone:'America/Bogota'});
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      function(pos){
+        var lat=pos.coords.latitude.toFixed(6),lng=pos.coords.longitude.toFixed(6);
+        var maps='https://maps.google.com/?q='+lat+','+lng;
+        document.getElementById('panicLoc').innerHTML='📍 <strong>Ubicación detectada</strong> · <a href="'+maps+'" target="_blank" style="color:#3B82F6;font-size:11px;">Ver en Maps</a>';
+        var sms=encodeURIComponent('EMERGENCIA LEGALI - '+storeName+' - GPS: '+maps+' - '+time+' - APOYO INMEDIATO');
+        var wa=encodeURIComponent('🚨 ALERTA PÁNICO LEGALI\n\nEstablecimiento: '+storeName+'\n📍 GPS: '+maps+'\n🕐 '+time+'\n\n⚠️ VERIFICAR INMEDIATAMENTE');
+        document.getElementById('btnPol').href='sms:'+cuadrante+'&body='+sms;
+        document.getElementById('btn156').href='sms:156&body='+sms;
+        document.getElementById('btnLeg').href='https://wa.me/573104571338?text='+wa;
+      },
+      function(){
+        document.getElementById('panicLoc').textContent='⚠️ GPS no disponible';
+        var sms=encodeURIComponent('EMERGENCIA LEGALI - '+storeName+' - '+time+' - APOYO INMEDIATO');
+        var wa=encodeURIComponent('🚨 ALERTA PÁNICO LEGALI\n\nEstablecimiento: '+storeName+'\n🕐 '+time+'\n\n⚠️ Sin GPS. VERIFICAR INMEDIATAMENTE');
+        document.getElementById('btnPol').href='sms:'+cuadrante+'&body='+sms;
+        document.getElementById('btn156').href='sms:156&body='+sms;
+        document.getElementById('btnLeg').href='https://wa.me/573104571338?text='+wa;
+      },
+      {timeout:5000,enableHighAccuracy:true}
+    );
+  }
+}
+
+function openOverlay(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
+function closeOverlay(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
+</script>
+</body>
+</html>

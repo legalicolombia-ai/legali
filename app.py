@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from ai.manager import AIManager
 from ai.reel_generator import ReelGenerator
-from brain.decision_engine import DecisionEngine
+from brain.commercial_intelligence import CommercialIntelligence
 from marketing.visual_generator import VisualGenerator
 from marketing.publisher import AIPublisher
 from data.memory_manager import MemoryManager
